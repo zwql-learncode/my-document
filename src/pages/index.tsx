@@ -25,7 +25,7 @@ export default function Home() {
           <div className="grid-item">
             <h2>Profile</h2>
             <img
-              src="/my-docs/img/avatar.jpg" // Đảm bảo file ảnh được đặt trong thư mục static/img/avatar.jpg
+              src="/img/avatar.jpg" // Đảm bảo file ảnh được đặt trong thư mục static/img/avatar.jpg
               alt="Avatar"
               className="grid-avatar"
             />
