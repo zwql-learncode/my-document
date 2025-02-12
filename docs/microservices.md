@@ -5,7 +5,7 @@ title: 1.Microservices
 
 # Microservices Document
 
-# 1.Microservices là gì?
+## 1.Microservices là gì?
 
 `Microservices` là các service nhỏ, độc lập và `loosely couple` (liên kết lỏng lẻo), có thể hoạt động cùng nhau
 
@@ -21,7 +21,7 @@ Microservices không cần sử dụng chung stack công nghệ, thư viện ho�
 
 Mỗi microservice có cơ sở dữ liệu hoặc tầng lưu trữ riêng (persistence layer), không chia sẻ với các service khác. Điều này khác với mô hình truyền thống, nơi một tầng dữ liệu chung đảm nhiệm việc lưu trữ dữ liệu cho toàn bộ hệ thống
 
-# 2.Kiến trúc Microservices là gì?
+## 2.Kiến trúc Microservices là gì?
 
 Theo Martin Fowler: “Phong cách kiến trúc microservices là một cách tiếp cận phát triển ứng dụng dưới dạng `suite of small services` (một tập hợp các service nhỏ), mỗi service chạy trong một `tiến trình riêng biệt` và `giao tiếp` với nhau thông qua API HTTP hoặc gRPC”.
 
@@ -33,7 +33,7 @@ Kiến trúc Microservices là một `mô hình kiến trúc cloud-native`, tron
 
 Mỗi microservice có stack công nghệ riêng và giao tiếp với nhau thông qua sự kết hợp của `REST API`, `event streaming` và `message broker`. Microservices được tổ chức theo từng `business capability` (năng lực nghiệp vụ) với ranh giới dịch vụ rõ ràng, thường được gọi là `bounded context`.
 
-# 3.Đặc điểm của microservices
+## 3.Đặc điểm của microservices
 
 `Phân tách thành các dịch vụ` (Componentization via Services): Mỗi component là một đơn vị phần mềm có thể thay thế và nâng cấp độc lập.
 
@@ -56,7 +56,7 @@ Việc triển khai microservices được tự động hóa, đảm bảo mỗi
 `Thiết kế để chịu lỗi` (Design for Failure):
 Microservices được thiết kế để xử lý lỗi một cách chủ động, bằng cách quản lý lỗi với các cơ chế xử lý thích hợp và tự phục hồi (self-healing mechanisms) nhằm đảm bảo hệ thống vẫn hoạt động ngay cả khi một số service gặp sự cố.
 
-# 4.Lợi ích của kiến trúc Microservices
+## 4.Lợi ích của kiến trúc Microservices
 
 `Nhanh nhạy, đổi mới và rút ngắn thời gian ra thị trường` (Agility, Innovation and Time-to-Market):Kiến trúc microservices giúp ứng dụng dễ mở rộng, phát triển nhanh hơn, thúc đẩy đổi mới và tăng tốc triển khai tính năng mới.
 
