@@ -7,6 +7,11 @@ const sidebars: SidebarsConfig = {
       label: "Design Pattern",
       items: ["repository", "dependency-injection"],
     },
+    {
+      type: "category",
+      label: "Architecture Pattern",
+      items: ["microservices"],
+    },
   ],
 };
 
