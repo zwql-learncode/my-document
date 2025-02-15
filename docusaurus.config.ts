@@ -3,7 +3,7 @@ import type { Config } from "@docusaurus/types";
 const config: Config = {
   title: "Nguyễn Quang Hưng",
   url: "https://zwql-learncode.github.io", // Thay URL phù hợp
-  baseUrl: "/my-document/",
+  baseUrl: "",
   organizationName: "zwql-learncode", // GitHub username
   projectName: "my-document",
   onBrokenLinks: "throw",
