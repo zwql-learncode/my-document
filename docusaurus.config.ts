@@ -2,10 +2,10 @@ import type { Config } from "@docusaurus/types";
 
 const config: Config = {
   title: "Nguyễn Quang Hưng",
-  url: "https://my-document-git-main-zwql-learncodes-projects.vercel.app/", // Thay URL phù hợp
+  url: "https://zwql-learncode.github.io", // Thay URL phù hợp
   baseUrl: "/",
   organizationName: "zwql-learncode", // GitHub username
-  projectName: "my-docs",
+  projectName: "my-document",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
