@@ -9,8 +9,8 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Architecture Pattern",
-      items: ["microservices"],
+      label: "Mehmet Ozkaya Document",
+      items: ["microservices, docker"],
     },
   ],
 };
