@@ -12,6 +12,22 @@ const sidebars: SidebarsConfig = {
       label: "Mehmet Ozkaya Document",
       items: ["microservices", "docker"],
     },
+    {
+      type: "category",
+      label: "200lab Document",
+      items: [
+        {
+          type: "category",
+          label: "Architecture Pattern",
+          items: ["200lab/microservices_200lab"],
+        },
+        {
+          type: "category",
+          label: "CI/CD",
+          items: ["200lab/docker_200lab"],
+        },
+      ],
+    },
   ],
 };
 

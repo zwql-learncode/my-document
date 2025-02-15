@@ -1,0 +1,59 @@
+---
+id: microservices_200lab
+title: Microservices
+---
+
+# Microservice Document
+
+Trong bài này, chúng ta sẽ cùng nhau tìm hiểu về kiến trúc đang rất nổi tiếng trong những năm trở lại đây - Microservice
+
+## 1. Kiến trúc microservice là gì?
+
+Microservice vốn là một thuật ngữ được đặt ra vào đầu những năm 2010, đề cập đến phong cách phát triển phần mềm trong đó các ứng dụng bao gồm các dịch vụ nhỏ và độc lập, thường gọi là "microservice". Mỗi microservice được thiết kế để thực hiện một chức năng duy nhất hoặc một nhóm nhỏ các chức năng liên quan, được quản lý độc lập với nhau.
+
+Một trong những hiểu lầm phổ biến khi người ta nhắc tới microservice là cần thiết kế để sao cho mỗi microservice càng nhỏ gọn càng tốt.
+
+Ví dụ bạn có 1 service bao gồm 300+ file. Liệu bạn có nghĩ service "đồ sộ" này có thể được coi là một microservice không? Câu trả lời tuỳ thuộc vào chức năng service này đảm nhận. Nếu service này nhận một nhiệm vụ chính là gửi email tới các khách hàng khác nhau thì nó vẫn sẽ là một microservice cho dù mã nguồn của nó trông như thế nào.
+
+Martin Fowler có một câu rất thú vị rằng:
+
+`The term “microservice” is a label, not a description.`
+
+Đại ý là người ta đã vô tình đặt cái tên `microservice` cho một phong cách kiến trúc mới - Microservices, để đối lập với phong cách kiến trúc thịnh hành thời điểm đó nhưng lại hết sức `cồng kềnh` là `Service-oriented architecture` (kiến trúc hướng dịch vụ).
+
+## 2. Các thành phần của kiến trúc microservice
+
+Microservice được xây dựng dựa trên khái niệm `bounded context`: Mỗi service mô hình hoá một domain hoặc một workflow. Nghĩa là mỗi service chứa mọi thứ cần thiết để hoạt động trong ứng dụng, bao gồm các class, các thành phần con trong nó và database.
+
+Các thành phần của kiến trúc microservice cơ bản bao gồm:
+
+- `Service`: chứa logic nghiệp vụ của microservice, chỉ có service mới được truy cập vào database.
+- `Database`: một tập hợpc các bảng chứa dữ liệu phục vụ cho logic nghiệp vụ của microservice.
+- `API gateway`: cung cấp một điểm truy cập thống nhất cho các microservice, giúp quản lý, điều phối và bảo mật giao tiếp giữa các service với nhau trong kiến trúc microservices, đồng thời cung cấp một nền tảng để triển khai các chính sách quản lý API và tối ưu giao tiếp.
+
+Ngoài ra, trong thực tế, người ta thường sử dụng `message broker` và `API layer`. Client giao tiếp với microservice thông qua API layer. Còn các microservice tương tác với nhau thông qua API dựa trên giao thức HTTP/REST, gRPC, ... hoặc thông qua một message broker.
+
+## 3. Trường hợp nên dùng kiến trúc microservice
+
+- Kiến trúc microservice sẽ phù hợp với các ứng dụng có thể chia chức năng thành hàng chục hoặc hàng trăm phần riêng biệt và độc lập với nhau.
+
+- Kiến trúc microservice sẽ phù hơp khi ứng dụng của bạn đỏi hỏi sự phản ứng nhanh với thay đổi. Khi ứng dụng được chia thành các thành phần riêng biệt, việc thay đổi mã nguồn ít gây ảnh hưởng tới cả hệ thống. Việc testing cũng trở nên dễ dàng hơn vì phạm vi test được giới hạn.
+
+- Nếu bạn đang có kế hoạch mở rộng rất nhiều thành phần trong hệ thống hiện tại, microservice cũng đáp ứng tốt. Trong vài trường hợp, việc tạo service mới chỉ bao gồm viết code tạo API, đóng gói trong container và deploy lên môi trường phù hợp. Các service khác chỉ việc gọi tới dúng endpoint.
+
+## 4. Trường hợp không nên dùng kiến trúc microservice
+
+- Nếu bản chất dữ liệu của bạn được liên kết chặt chẽ và không thể chia dữ liệu ra thành các database chạy độc lập (Ví dụ: foreign key constraints, triggers, views, và stored procedures).
+
+- Để thực hành kiến trúc Microservice, tổ chức của bạn cần có nguồn lực đủ mạnh về con người, thời gian và tài chính. Vậy nên, nếu tổ chức đang chạy dự án với ngân sách tài chính hoặc con người hoặc cả hai đều eo hẹp, áp dụng microservice sẽ khiến mọi thứ trở nên rất phức tạp.
+
+- Các service kết nối từ xa nên độ trễ bao gồm độ trễ mạng, độ trễ bảo mật, độ trễ dữ liệu sẽ là một điểm cần được cân nhắc khi áp dụng microservice. Ví dụ, đỗ trễ mạng có thể lên tới 30 ms đến trên 300 ms. Dự liệu cần được xác thực hoặc uỷ quyền giữa các service với nhau có thể mất từ 30 ms đến trên 300 ms. Truy cập dữ liệu giữa các service với nhau có thể chậm do phải query qua nhiều service khác nhau.
+
+## 5. Tổng kết
+
+- Mặc dù microservice rất phổ biến và mạnh mẽ nhưng có lẽ đây cũng là kiến ​​trúc khó triển khai nhất.
+- Dưới đây là bảng điểm xếp hạng cho kiến trúc microservices trích trong sách Software Architecture Patterns của Mark Richards. Kiến trúc này được đánh giá cao nhất ở khả năng mở rộng, khả năng chịu lỗi và tính linh hoạt. Tuy nhiên, kiến trúc này được đánh giá là chi phí cao, việc áp dụng phức tạp và gặp nhiều vấn đề liên quan đến hiệu suất.
+
+![Điểm xếp hạng cho kiến trúc Microservice - Nguồn: Software Architecture Patterns - Mark Richards](/img/200lab/micro-service.jpg)
+
+> _Điểm xếp hạng cho kiến trúc Microservice - Nguồn: Software Architecture Patterns - Mark Richards_
