@@ -1,0 +1,73 @@
+---
+id: vsa
+title: 3.Vertical Slice Architecture
+---
+
+# Vertical Slice Architecture(VSA) Document
+
+Nguồn: Khóa học [Udemy .NET 8 Microservices](https://www.udemy.com/course/microservices-architecture-and-implementation-on-dotnet) của tác giả [Mehmet Ozkaya](https://www.linkedin.com/in/mehmet-ozkaya/?originalSubdomain=tr)
+
+## 1. Vertical Slice Architecture(VSA) là gì?
+
+![Vertial Slice Architecture image](/img/mehmet/vsa.png)
+
+> _Vertial Slice Architecture_
+
+Được giới thiệu bởi Jimmy Bogard, kiến trúc này là một hướng tiếp cận `thay thế cho các kiến trúc truyền thống` như Layered Architecture, Onion Architecture, Clean Architecture.
+VSA `tổ chức mã nguồn theo từng tính năng cụ thể` (organize code around specific features or use cases) , thay vì chia theo `các lớp kỹ thuật` (technical concerns) như MVC hay N-Layered.
+Mỗi `tính năng` (feature) được triển khai xuyên suốt (across all layers) từ UI đến database, thay vì tách biệt thành các tầng riêng biệt.
+Cách tiếp cận này thường được sử dụng trong việc phát triển `các ứng dụng phức tạp, giàu tính năng` (complex, feature-rich applications) đặc biệt là các ứng dụng web.
+Chia ứng dụng thành `các tính năng` (features) riêng biệt, mỗi tính năng này sẽ `đi xuyên suốt qua tất cả các tầng` (cuts through all the layers ) của ứng dụng.
+Trái ngược với các kiến trúc truyền thống như N-Layered, nơi ứng dụng được `chia theo chiều ngang` (divided horizontally) thành các tầng như Presentation, Business Logic, và Data Access.
+
+## 2. Đặc điểm của Vertical Slice Architecture(VSA)
+
+- Ứng dụng được chia thành các `lát cắt dựa trên tính năng` (feature-based slices): Ứng dụng được tổ chức thành các lát cắt theo từng feature hoặc use case cụ thể. Mỗi slice đại diện cho một luồng xử lý hoàn chỉnh, bao gồm UI, business logic và data access.
+- Mỗi slice `độc lập`(independent) & `tự chứa` (self-contained): Mỗi slice được thiết kế để độc lập và tự chứa, không phụ thuộc vào các phần khác. Điều này có nghĩa là một tính năng có thể được phát triển, kiểm thử và triển khai mà không làm ảnh hưởng đến các phần khác của hệ thống.
+- `Giảm thiểu phụ thuộc` (reduced dependencies) giữa các phần khác nhau của ứng dụng: Bằng cách tập trung vào các vertical slices, sự phụ thuộc giữa các phần khác nhau của ứng dụng được giảm thiểu. Mỗi slice có thể được coi như một ứng dụng nhỏ với chức năng và các phụ thuộc riêng biệt.
+- Khuyến khích việc sử dụng các `cross-functional teams`(các nhóm đa chức năng): Các development team làm việc với kiến trúc vertical slice thường là `cross-functional teams`, bao gồm tất cả các kỹ năng cần thiết để phát triển một tính năng từ đầu đến cuối.
+- Hỗ trợ khả năng mở rộng và bảo trì: Kiến trúc này giúp cải thiện khả năng mở rộng và bảo trì. Theo thời gian, khi ứng dụng phình to ra, các tính năng mới có thể thêm vào dưới dạng một vertical slice mới mà không ảnh hưởng tới mã nguồn hiện tại.
+- Cải thiện quy trình testing và deployment: Mỗi vertical slice có thể được kiểm thử và triển khai độc lập, giúp đơn giản hóa quá trình kiểm thử, đồng thời tăng độ tin cậy và tốc độ triển khai. Vì VSA là một `mô hình kiến trúc ứng dụng nội bộ` (internal application architecture pattern).
+
+## 3. Lợi ích của Vertical Slice Architecture(VSA)
+
+- `Phát triển tập trung`: Các nhóm có thể tập trung vào từng tính năng một cách độc lập.
+- `Dễ dàng refactor (tái cấu trúc) và nâng cấp`: Thay đổi trong một slice thường không ảnh hưởng đến các slice khác.
+- `Phù hợp với Agile và DevOps`: Hỗ trợ phát triển theo từng giai đoạn và triển khai liên tục.
+
+## 4. Thách thức của Vertical Slice Architecture(VSA)
+
+- `Trùng lặp mã giữa các phần`: Đặc biệt với các chức năng dùng chung.
+- `Learning curve involved`: Có nghĩa là độ khó hoặc mức độ phức tạp của quá trình học tập khi làm quen với một công nghệ, kỹ năng hoặc công việc mới. Nhất là với các nhóm đã quen thuộc với các kiến trúc truyền thống.
+- `Thiết kế từng slice cần được cân nhắc cẩn thận`: Để đảm bảo tính độc lập và khả năng bảo trì.
+
+## 5. So sánh Vertical Slice Architecture (VSA) và Clean Architecture (CA)
+
+### 5.1. Tổ chức mã nguồn
+
+- VSA tập trung vào việc tổ chức & phát triển phần mềm `theo tính năng` (around features). Mỗi tính năng sẽ `xuyên suốt tất cả các lớp theo chiều dọc` (cutting through all layer in a vertical manner). Mỗi slice sẽ là một tính năng được phát triển và triển khai độc lập.
+- CA tập trung vào 2 nguyễn tắc `separation of concerns` và `dependency inversion`: Nó tổ chức mã nguồn thành các layer. Các `most stability layers`(các lớp ổn định nhất) như Entities và Use Cases(chứa business logic) sẽ nằm ở trung tâm kiến trúc. Lớp `data access` và `presentation` sẽ nằm ở ngoài cùng.
+  - `Separation of concerns` (SoC): Là một nguyên lý thiết kế giúp tách biệt các phần chức năng khác nhau của một hệ thống, đảm bảo mỗi phần chỉ xử lý một nhiệm vụ duy nhất, không phụ thuộc vào các phần khác. Nguyên lý này giúp mã nguồn dễ bảo trì, mở rộng và kiểm thử hơn.
+  - `Dependency Inversion`: Là một nguyên lý trong SOLID giúp tăng cường tính linh hoạt và khả năng mở rộng của hệ thống. Nguyên lý này gồm hai phần chính:
+    - Các `mô-đun cấp cao` (high-level modules) không nên phụ thuộc vào các `mô-đun cấp thấp` (low-level modules). Thay vào đó, cả hai mô-đun này nên phụ thuộc vào các `abstraction`(trừu tượng) như các interfaces hoặc abstract classes.
+    - Các `abstractions`(trừu tượng) không nên phụ thuộc vào các `details`(chi tiết cụ thể). Ngược lại, các `details` nên phụ thuộc vào các `abstractions`.
+
+### 5.2. Quy trình phát triển
+
+- Với VSA, các nhóm phát triển tập trung vào việc cung cấp các tính năng hoàn chỉnh, mỗi tính năng có thể ảnh hưởng đến tất cả các lớp trong hệ thống. Kiến trúc này phù hợp chặt chẽ với các phương pháp Agile, nơi việc triển khai nhanh chóng các tính năng có thể kiểm thử và hoạt động là yếu tố quan trọng.
+- CA có một cách tiếp cận có cấu trúc hơn, đảm bảo rằng `domain` (nghiệp vụ) được tách rời khỏi các yếu tố bên ngoài. Cách tiếp cận này có lợi cho khả năng bảo trì và mở rộng trong dài hạn.
+
+### 5.3. Khả năng mở rộng và bảo trì
+
+- VSA phù hợp trong các tình huống yêu cầu phát triển và triển khai nhanh các tính năng độc lập. Nó đặc biệt phù hợp với các nhóm Agile làm việc trên các ứng dụng phức tạp với nhiều tính năng có thể thay đổi hoặc phát triển độc lập.
+- CA là lý tưởng cho các ứng dụng quy mô lớn, nơi việc bảo trì lâu dài, khả năng mở rộng và khả năng thích ứng với yêu cầu kinh doanh hoặc công nghệ thay đổi là quan trọng hàng đầu. Nó đảm bảo rằng logic nghiệp vụ cốt lõi không bị ảnh hưởng bởi những thay đổi ở các lớp bên ngoài.
+
+## 6. Khi nào chọn Vertical Slice Architecture (VSA) thay vì Clean Architecture (CA)?
+
+- `Phát triển và triển khai (deployment) nhanh chóng`: Khi ưu tiên phát triển và triển khai (deployment) các tính năng một cách nhanh chóng và độc lập, VSA sẽ phù hợp hơn.
+- `Agile & Scrum Team`: Dành cho các team sử dụng phương pháp Agile hoặc Scrum trong quy trình phát triển, cần cung cấp các tính năng hoàn chỉnh trong các chu kỳ ngắn. VSA rất phù hợp với các phương pháp này.
+
+## 7. Ví dụ trong khóa học
+
+- `Catalog Service sử dụng VSA`: Trong dự án Microservices của tác giả, Catalog Service thực hiện `quản lý các sản phẩm`, `quản lý danh mục` và `quản lý tồn kho`. Mỗi tính năng (như thêm sản phẩm, cập nhật tồn kho hoặc quản lý danh mục) được phát triển như một slice riêng biệt. Mỗi slice sẽ bao gồm API endpoint, business logic và data access code riêng, cho phép phát triển nhanh chóng và cập nhật các yếu tố riêng biệt của catalog sản phẩm mà không ảnh hưởng đến các thành phần khác của service.
+- `Order Service sử dụng CA`: Dịch vụ đặt hàng xử lý các quy trình đặt hàng, bao gồm `quản lý giỏ hàng`, `đặt hàng` và `xử lý thanh toán`. Với CA, các business logic cốt lõi và use case của quy trình đặt hàng được tập trung và tách biệt khỏi các yếu tố bên ngoài như database hay các hoạt động của UI. Sự tách biệt này đảm bảo rằng các business logics quan trọng vẫn ổn định và không bị ảnh hưởng bởi các thay đổi trong các hệ thống bên ngoài, như payment gateway hoặc database schemas.

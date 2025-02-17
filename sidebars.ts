@@ -10,7 +10,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Mehmet Ozkaya Document",
-      items: ["microservices", "docker"],
+      items: ["microservices", "docker", "vsa"],
     },
     {
       type: "category",
