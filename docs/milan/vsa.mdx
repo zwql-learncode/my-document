@@ -124,6 +124,6 @@ Tuy nhiên, VSA có vấn đề là:
 
 - Nếu use case phát triển quá lớn, nó có thể trở nên cồng kềnh và làm quá nhiều việc. Khi đó, bạn cần refactor (tái cấu trúc) bằng cách đẩy logic xuống tầng domain, giúp hệ thống dễ bảo trì hơn.
 
-Vertical Slice Architecture sẽ phù hợp hơn với hệ thống sử dụng kết hợp Microservices & CQRS. Nơi mà mỗi Serivice hay các thành phần của nó là Command và Query có thể hoạt động độc lập mà không cần biết đến các Service hay Command và Query khác. Số lượng API cho mỗi serivce cũng không quá lớn như monolithic.
+Vertical Slice Architecture sẽ phù hợp hơn với hệ thống sử dụng kết hợp Microservices & CQRS. Nơi mà mỗi Service hay các thành phần của nó là Command và Query có thể hoạt động độc lập mà không cần biết đến các Service hay Command và Query khác. Số lượng API cho mỗi ứng dụng cũng không quá lớn như monolithic.
 
 Các kiến trúc phân tầng như Clean Architecture tổ chức solution theo layer, dẫn đến cấu trúc thư mục được nhóm theo `khía cạnh kỹ thuật` (technical concerns). Ngược lại, Vertical Slice Architecture tổ chức code theo từng feature (tính năng) hoặc use case.
