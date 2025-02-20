@@ -9,8 +9,18 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Architecture Pattern",
+      items: ["milan/vsa_milan"],
+    },
+    {
+      type: "category",
       label: "Mehmet Ozkaya Document",
-      items: ["microservices", "docker", "vsa", "cqrs"],
+      items: [
+        "mehmet/microservices",
+        "mehmet/docker",
+        "mehmet/vsa",
+        "mehmet/cqrs",
+      ],
     },
     {
       type: "category",

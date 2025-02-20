@@ -1,6 +1,6 @@
 ---
 id: repository
-title: 1.Repository
+title: Repository
 ---
 
 # Repository

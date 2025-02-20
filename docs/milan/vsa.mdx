@@ -1,0 +1,129 @@
+---
+id: vsa_milan
+title: Vertical Slice Architecture
+---
+
+# Vertical Slice Architecture (VSA) Document
+
+Dịch từ bài viết [Vertical Slice Architecture](https://www.milanjovanovic.tech/blog/vertical-slice-architecture) của Milan Jovanović
+
+`Kiến trúc phân lớp` (Layered Architectures) là nền tảng của nhiều hệ thống phần mềm. Tuy nhiên, mô hình này tổ chức hệ thống theo `các lớp kỹ thuật`(technical layers), dẫn đến `sự liên kết giữa các lớp` (cohesion between layers) khá thấp. Nhưng nếu ta muốn tổ chức hệ thống dựa trên các tính năng (features) thì sao? `Giảm thiểu liên kết` (Minimize coupling) giữa `các tính năng không liên quan` (unrelated features) và `tăng cường liên kết`(maximize coupling) trong `một tính năng duy nhất` (single feature). Hôm nay, tôi sẽ giới thiệu về `Vertical Slice Architecture`, một mẫu kiến trúc giúp đạt được điều đó.
+
+## 1. Vấn Đề Của Layered Architectures (Kiến Trúc Phân Lớp)
+
+Kiến trúc phân lớp tổ chức hệ thống phần mềm thành các tầng (layers) hoặc lớp (tiers). Mỗi tầng thường được triển khai dưới dạng một project riêng trong solution (cách triển khai trong ASP.NET). Một số kiến trúc phân lớp phổ biến có thể kể đến như N-Layer(aka mô hình 3 lớp), Clean Architecture,...
+
+Mục tiêu chính của Layered Architectures là `separation of concerns` giữa các thành phần khác nhau trong hệ thống. Điều này giúp hệ thống phần mềm dễ hiểu, dễ bảo trì. Và nó mang lại rất nhiều lợi ích cho kiến trúc phần mềm như: `tính bảo trì` (maintainability), `tính linh hoạt`(flexibility) và `loose coupling`
+
+- `separation of concerns`: Chia nhỏ hệ thống thành các phần riêng biệt, mỗi phần chỉ chịu trách nhiệm một nhiệm vụ cụ thể.
+- `loose coupling`: Khớp nối lỏng lẻo. Tức là các thành phần ít phụ thuộc vào nhau.
+
+Tuy nhiên, Layered Architectures cũng áp đặt những ràng buộc hoặc quy tắc cứng nhắc lên hệ thống. Hướng sự phụ thuộc giữa các tầng được xác định trước (The direction of dependencies between layers is pre-determined).
+
+![Ảnh minh họa: Clean Architecture kết hợp với Domain-Driven Design](/img/milan/clean_architecture.png)
+
+> _Clean Architecture kết hợp với Domain-Driven Design_
+
+Lấy ví dụ với Clean Architecture
+
+- Domain layer (chứa Entities, business logic) không được phụ thuộc vào bất cứ thành phần nào.
+- Application layer (chứa trạng thái của ứng dụng, command, queries) tham chiếu đến Domain.
+- Infrastructure layer (chứa data access, code cơ sở hạ tầng) tham chiếu đến Application và Domain.
+- Presentation layer (chứa API hoặc UI) tham chiếu đến Application và Domain.
+
+Kết quả là bạn sẽ có mức độ `high coupling` (khớp nối chặt chẽ) bên trong mỗi layer nhưng mức độ `low coupling` (khớp nối lỏng lẻo) giữa các tầng. Điều này không có nghĩa là Layered Architecture là tệ, nhưng nó đồng nghĩa với việc sẽ có nhiều abstractions giữa các layer. Mà càng nhiều abstractions thì độ phức tạp tăng lên, vì có nhiều thành phần cần phải bảo trì hơn.
+
+## 2. Vertical Slice Architecture (VSA) là gì?
+
+Tôi lần đầu nghe về Vertical Slice Architecture từ Jimmy Bogard, người cũng là tác giả của một số thư viện mã nguồn mở nổi tiếng như MediatR và AutoMapper.
+
+Vertical Slice Architecture ra đời nhằm giải quyết những bất cập khi làm việc với Layered Architecture. Yêu cầu bạn phải chỉnh sửa nhiều layer khác nhau để triển khai một tính năng, gây phức tạp và mất thời gian.
+
+Tưởng tượng quá trình thêm một tính năng mới trong Clean Architecture kết hợp với CQRS và DDD như thế này:
+
+- Cập nhật Entites trong Domain layer.
+- Chỉnh sửa business logic của Validation trong Application layer.
+- Sửa hoặc thêm mới use case trong command handler (với MediatR) trong Application layer.
+- Sửa hoặc tạo mới một API endpoint trong trong Presentation layer.
+
+Ta có thể tháy rằng `tính kết nối` (cohesion) trong Layered Architecture thấp vì bạn phải tạo nhiều file ở các layer khác nhau. Vertical Slice Architecture cho phép bạn tiếp cận theo cách khác:
+
+- Giảm thiểu sự liên kết giữa các slice (low coupling giữa các slice).
+- Tăng cường kết nối bên trong một slice (high cohesion trong mỗi slice).
+
+Dưới đây là cách bạn có thể hình dung về Vertical Slice Architecture:
+
+![Ảnh minh họa: Vertical Slice Architecture](/img/milan/vertical_slice_architecture.png)
+
+> _Vertical Slice Architecture_
+
+Tất cả các file liên quan (từ API end point cho đến business logic) đến một use case đều được nhóm vào cùng một feature folder. Điều này giúp tính kết nối (cohesion) trong một use case rất cao, từ đó đơn giản hóa quá trình phát triển.
+
+Mỗi một feature folder chính là một vertical slice. Mỗi vertical slice cắt dọc, xuyên suốt qua tất cả các layer.
+
+Nhờ cách tập trung vào tính năng, bạn dễ dàng tìm thấy tất cả các thành phần liên quan đến một `feature` (tính năng) vì chúng được đặt gần nhau.
+
+## 3. Triển khai Vertical Slice Architecture (VSA) với CQRS
+
+Nếu bạn đang xây dựng một API sử dụng CQRS. Với việc sử dụng VSA, mỗi slice tập trung hẹp vào một tính năng cụ thể. Điều này cho phép bạn xử lý từng use case một cách độc lập, tùy chỉnh cách triển khai sao cho phù hợp nhất. Ví dụ:
+
+- Một vertical slice có thể dùng EF Core ORM để thực hiện truy vấn GET.
+- Một vertical slice khác có thể sử dụng Dapper ORM với truy vấn SQL thuần để lấy dữ liệu.
+
+Một cách tiếp cận thú vị để tổ chức API theo tính năng là sử dụng REPR Pattern.REPR là viết tắt của:
+
+- Request – Định nghĩa dữ liệu đầu vào của API.
+- EndPoint – Xử lý yêu cầu, gọi logic nghiệp vụ.
+- Response – Định nghĩa dữ liệu trả về cho client.
+
+Mô hình này phù hợp hoàn toàn với Vertical Slice Architecture, vì mỗi API được nhóm lại theo request cụ thể thay vì chia theo tầng. Bạn có thể dễ dàng triển khai REPR Pattern với thư viện MediatR.
+
+Dưới đây là một ví dụ về cấu trúc solution trong .NET. Bạn sẽ thấy thư mục Features, nơi chứa các vertical slices. Mỗi slice triển khai một yêu cầu API (hoặc một use case).
+
+```
+🔗 RunTracker.API
+|__ 📁 Database
+|__ 📁 Entities
+    |__ #️⃣ Activity.cs
+    |__ #️⃣ Workout.cs
+    |__ #️⃣ ...
+|__ 📁 Features
+    |__ 📁 Activities
+        |__ 📁 GetActivity
+            |__ #️⃣ ActivityResponse.cs
+            |__ #️⃣ GetActivityEndpoint.cs
+            |__ #️⃣ GetActivityQuery.cs
+            |__ #️⃣ GetActivityQueryHandler.cs
+        |__ 📁 CreateActivity
+            |__ #️⃣ CreateActivity.cs
+                |__ #️⃣ CreateActivity.Command.cs
+                |__ #️⃣ CreateActivity.Endpoint.cs
+                |__ #️⃣ CreateActivity.Handler.cs
+                |__ #️⃣ CreateActivity.Validator.cs
+    |__ 📁 Workouts
+    |__ 📁 ...
+|__ 📁 Middleware
+|__ 📄 appsettings.json
+|__ 📄 appsettings.Development.json
+|__ #️⃣ Program.cs
+```
+
+## 4. Tổng kết
+
+Lợi ích của VSA là:
+
+- Khi thêm tính năng mới, bạn chỉ cần thêm code, không cần chỉnh sửa code dùng chung. Điều này giúp tránh `side effects` lên các phần khác của hệ thống.
+
+- `side effects`: tác dụng phụ - tác dụng ngoài ý muốn
+
+Tuy nhiên, VSA có vấn đề là:
+
+- Vì phần lớn logic nghiệp vụ nằm trong từng use case riêng lẻ, bạn cần phát hiện sớm code smells (dấu hiệu thiết kế kém). Phải đảm bảo mỗi slice có tính độc lập và khả năng bảo trì.
+
+- Vần đế về trùng lặp code giữa các phần: Đặc biệt với các chức năng dùng chung.
+
+- Nếu use case phát triển quá lớn, nó có thể trở nên cồng kềnh và làm quá nhiều việc. Khi đó, bạn cần refactor (tái cấu trúc) bằng cách đẩy logic xuống tầng domain, giúp hệ thống dễ bảo trì hơn.
+
+Vertical Slice Architecture sẽ phù hợp hơn với hệ thống sử dụng kết hợp Microservices & CQRS. Nơi mà mỗi Serivice hay các thành phần của nó là Command và Query có thể hoạt động độc lập mà không cần biết đến các Service hay Command và Query khác. Số lượng API cho mỗi serivce cũng không quá lớn như monolithic.
+
+Các kiến trúc phân tầng như Clean Architecture tổ chức solution theo layer, dẫn đến cấu trúc thư mục được nhóm theo `khía cạnh kỹ thuật` (technical concerns). Ngược lại, Vertical Slice Architecture tổ chức code theo từng feature (tính năng) hoặc use case.

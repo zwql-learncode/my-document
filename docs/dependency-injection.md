@@ -1,6 +1,6 @@
 ---
 id: dependency-injection
-title: 2.Dependency Injection
+title: Dependency Injection
 ---
 
 # Dependency Injection(Tiêm phụ thuộc)
