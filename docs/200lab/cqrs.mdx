@@ -1,0 +1,139 @@
+---
+id: cqrs_200lab
+title: CQRS
+---
+
+# CQRS là gì? Giới thiệu Design Pattern Command Query Responsibility Segregation
+
+Nguồn: [200Lab](https://200lab.io/blog/cqrs-la-gi)
+
+CQRS là một mẫu thiết kế tách biệt các thao tác đọc dữ liệu (queries) với các thao tác cập nhật dữ liệu (commands)
+
+CQRS hoạt động dựa trên nguyên tắc `chia để trị`(separation of concerns), tách biệt hai luồng hoạt động chính của hệ thống – đọc (queries) và ghi (commands) – để tối ưu hóa hiệu suất, dễ mở rộng và bảo trì. Nhờ cách tổ chức này, các hệ thống lớn có thể vận hành hiệu quả hơn mà không gặp phải các vấn đề thường thấy trong các thiết kế cơ sở dữ liệu truyền thống.
+
+Vậy CQRS thực sự là gì? Trong bài viết này, chúng ta sẽ cùng khám phá cách CQRS tách biệt trách nhiệm giữa các thao tác đọc và ghi dữ liệu. Mình cũng sẽ nêu ra các tình huống thực tế để các bạn hiểu rõ khi nào nên (hoặc không nên) áp dụng CQRS.
+
+## 1. Ôn lại kiến thức về Database
+
+Khi nói về cơ sở dữ liệu (database), hầu hết chúng ta thường dùng một database để làm tất cả mọi việc: ghi dữ liệu (write) và đọc dữ liệu (read). Cách tiếp cận này cực kì hiệu quả với các hệ thống nhỏ, hoặc có logic đơn giản.
+
+Tuy nhiên, việc kết hợp cả hai nhiệm vụ này trong cùng một database không phải lúc nào cũng hiệu quả. Trước khi đi sâu vào giải pháp CQRS, hãy cùng ôn lại một số khái niệm cơ bản và lý do tại sao việc dùng một database duy nhất cho cả đọc và ghi lại là một thách thức lớn khi quy mô người dùng tăng lên nhanh chóng.
+
+### Vấn đề về Hiệu suất
+
+- Thao tác ghi (write) thường yêu cầu tài nguyên cao hơn do phải thực hiện các bước như khóa bảng (table locking), ghi log giao dịch (transaction log), và cập nhật chỉ mục (index updates).
+
+- Trong khi đó, thao tác đọc (read) cần truy vấn nhanh với thời gian phản hồi thấp. Khi hai loại thao tác này cạnh tranh tài nguyên trên cùng một cơ sở dữ liệu, hiệu suất tổng thể của hệ thống bị ảnh hưởng.
+
+### Xung đột tài nguyên (Resource Contention)
+
+- Thao tác ghi thường yêu cầu khóa bảng hoặc hàng dữ liệu để đảm bảo tính toàn vẹn, làm cản trở các truy vấn đọc.
+
+- Khi hệ thống có hàng nghìn truy vấn đồng thời, các xung đột này có thể dẫn đến tắc nghẽn (bottlenecks) hoặc thậm chí làm sập hệ thống.
+
+### Độ phức tạp khi tối ưu hóa
+
+- Thêm index để tăng tốc đọc có thể làm tăng chi phí cập nhật index trong thao tác ghi. Ngược lại, giảm index để tăng tốc ghi có thể làm các truy vấn đọc chậm hơn.
+
+## 2. CQRS là gì?
+
+CQRS (Command Query Responsibility Segregation) là một mô mẫu thiết kế (design pattern) tách biệt các thao tác đọc dữ liệu (queries) với các thao tác cập nhật dữ liệu (commands). CQRS nhấn mạnh vào nguyên tắc SRP (Single Responsibility Principle) trong SOLID, đảm bảo mỗi phần của hệ thống có một nhiệm vụ duy nhất, rõ ràng và độc lập.
+
+Ý tưởng đằng sau CQRS là cải thiện khả năng chịu tải bằng cách phân phối xử lý đọc và ghi lên các dịch vụ hoặc cơ sở hạ tầng khác nhau, giảm sự phức tạp trong mã nguồn khi trách nhiệm đã được chia nhỏ.
+
+## 3. CQRS hoạt động như thế nào?
+
+### 3.1 Thành phần chính trong CQRS
+
+CQRS bao gồm hai phần chính:
+
+- Command Model (Mô hình ghi):
+
+  - Chịu trách nhiệm xử lý tất cả các thay đổi trạng thái của hệ thống.
+  - Nhận lệnh từ người dùng hoặc ứng dụng, thực hiện kiểm tra nghiệp vụ, và cập nhật trạng thái thông qua các hành động như tạo, sửa đổi, hoặc xóa dữ liệu.
+  - Các lệnh không trả về dữ liệu – chúng chỉ xác nhận rằng thao tác đã được thực hiện.
+
+- Query Model (Mô hình đọc):
+
+  - Xử lý các yêu cầu đọc dữ liệu và trả về kết quả.
+  - Tối ưu hóa cho việc truy xuất nhanh, có thể sử dụng các bản sao dữ liệu (read replicas) hoặc cơ chế caching để cải thiện hiệu suất.
+  - Được thiết kế riêng biệt với mô hình ghi, không phụ thuộc vào cấu trúc dữ liệu phức tạp của Command Model.
+
+### 3.2 Quy trình hoạt động của CQRS
+
+CQRS hoạt động thông qua việc tách luồng dữ liệu thành hai hướng độc lập:
+
+- Luồng ghi (Command Flow):
+
+  - Người dùng thực hiện một hành động, như "đặt hàng" trên ứng dụng thương mại điện tử.
+  - Lệnh này được gửi đến Command Model, hệ thống sẽ thực hiện kiểm tra các quy tắc nghiệp vụ (business rules), như "số lượng sản phẩm còn đủ không?".
+  - Sau khi kiểm tra, Command Model cập nhật trạng thái hệ thống, có thể lưu trữ thay đổi dưới dạng sự kiện nếu kết hợp với Event Sourcing.
+
+- Luồng đọc (Query Flow):
+
+  - Người dùng yêu cầu dữ liệu, như "xem chi tiết đơn hàng".
+  - Yêu cầu này được chuyển đến Query Model, hệ thống sẽ truy xuất dữ liệu từ nguồn tối ưu, chẳng hạn như bảng tổng hợp sẵn hoặc cơ sở dữ liệu dành riêng cho việc đọc.
+  - Kết quả được trả về nhanh chóng mà không bị ảnh hưởng bởi các thao tác ghi đang diễn ra.
+
+### 3.3 Cơ chế đồng bộ giữa đọc và ghi
+
+Một trong những thách thức của CQRS là đảm bảo dữ liệu giữa Command Model và Query Model luôn nhất quán. Tuy nhiên, CQRS thường áp dụng chiến lược "eventual consistency":
+
+- Sau khi dữ liệu được ghi, các thay đổi được chuyển đến Query Model thông qua các sự kiện (events).
+- Các sự kiện này được xử lý không đồng bộ, đảm bảo Query Model sẽ cập nhật thông tin mới nhất trong khoảng thời gian ngắn.
+
+Ví dụ: Trong một hệ thống thương mại điện tử:
+
+- Khi người dùng đặt hàng, Command Model xử lý đơn đặt hàng ngay lập tức.
+- Dữ liệu về đơn hàng mới sau đó được đồng bộ hóa với Query Model để hiển thị thông tin cập nhật.
+
+## 4. Khi nào nên áp dụng CQRS
+
+### 4.1 Khối lượng đọc lớn hơn rất nhiều so với ghi
+
+CQRS rất hữu ích trong các hệ thống có khối lượng đọc (read-heavy) lớn hơn rất nhiều so với ghi (write).
+
+Ví dụ: Với một nền tảng thương mại điện tử, lượng người dùng truy vấn danh sách sản phẩm (đọc) trong các chiến dịch lớn như Black Friday thường gấp hàng trăm lần lượng thao tác đặt hàng (ghi). CQRS giúp tối ưu hóa thao tác đọc bằng cách sử dụng các bản sao dữ liệu (read replicas) hoặc hệ thống caching riêng biệt, trong khi phần ghi vẫn được duy trì chính xác và an toàn.
+
+Các thao tác đọc có thể dễ dàng mở rộng ngang (horizontal scaling) bằng cách thêm nhiều máy chủ đọc (read replica hoặc read-only server). Ngược lại, thao tác ghi thường khó mở rộng hơn vì cần đảm bảo tính toàn vẹn và nhất quán của dữ liệu.
+
+### 4.2 Hệ thống có logic nghiệp vụ phức tạp
+
+Trong các hệ thống với logic nghiệp vụ phức tạp, các thao tác ghi thường yêu cầu kiểm tra nhiều quy tắc trước khi thay đổi trạng thái hệ thống, trong khi thao tác đọc chỉ trả về dữ liệu đơn giản. CQRS giúp giảm độ phức tạp của hệ thống bằng cách cho phép từng luồng thao tác (đọc, ghi) được tối ưu hóa theo yêu cầu riêng, khiến việc maintain của bạn trở nên dễ dàng hơn.
+
+### 4.3 Hệ thống yêu cầu đọc thời gian thực
+
+CQRS phù hợp với các hệ thống cần cung cấp dữ liệu gần như tức thời, liên tục cho người dùng cuối mà không bị chậm bởi các thao tác ghi. Tuy nhiên, cần lưu ý rằng CQRS không đảm bảo tính đồng bộ tuyệt đối trong thời gian thực , mà thường dựa vào khái niệm "eventual consistency". Điều này có nghĩa là dữ liệu đọc có thể có độ trễ nhỏ so với dữ liệu ghi, tùy thuộc vào cách hệ thống xử lý.
+
+Ví dụ thực tế: Một hệ thống giao dịch chứng khoán:
+
+- Giá cổ phiếu hiển thị cho nhà đầu tư có thể không phải giá "tức thời" (giá chính xác), mà là giá được tổng hợp hoặc làm mới định kỳ (từng mili-giây hoặc giây).
+- Các lệnh mua/bán được xử lý chính xác và ghi vào hệ thống chính, nhưng việc đồng bộ hóa với dữ liệu đọc có thể có một độ trễ nhỏ. Các bạn sẽ dễ dàng nhận thấy khi chúng ta đặt lệnh mua/bán, giá sẽ chênh lệch một xíu so với giá mà chúng ta nhìn thấy.
+- Nhờ CQRS, phần đọc có thể sử dụng dữ liệu tổng hợp nhanh mà không làm gián đoạn quá trình ghi và xử lý giao dịch phức tạp.
+
+### 4.4 Khi cần kết hợp với Event Sourcing
+
+CQRS và Event Sourcing là cặp đôi thường đi cùng nhau, đặc biệt trong các hệ thống phức tạp yêu cầu lưu trữ lịch sử thay đổi một cách chi tiết, hoặc tái tạo trạng thái hệ thống từ dữ liệu quá khứ.
+
+Thay vì lưu trạng thái hiện tại, Event Sourcing ghi lại mọi thay đổi trong hệ thống dưới dạng một chuỗi sự kiện. CQRS tách biệt đọc và ghi, giúp bạn tận dụng các sự kiện này một cách hiệu quả hơn.
+
+![ Ảnh minh họa: CQRS kết hợp với Event Sourcing](/img/200lab/cqrs-event-sourcing.jpg)
+
+Ví dụ cụ thể với: Ứng dụng Thương mại điện tử (E-commerce) có lượng truy cập đồng thời rất cao, mỗi sản phẩm đều có lượt đáng giá và trung bình đánh giá. Sẽ ra sao nếu như ở mỗi lần tải trang danh sách hàng hoá, hệ thống phải thực hiện tính toán và đồng thời cũng có khách hàng đang thực hiện đánh giá sản phẩm?! Đây là lúc CQRS xuất hiện để giải quyết vấn đề này.
+
+- Thao tác ghi (write/command):
+
+  - Sự kiện ghi nhận: "Một user vừa mới thêm đánh giá trên sản phẩm'".
+  - Hệ thống không thay đổi trực tiếp các bộ đếm mà chỉ lưu sự kiện này vào danh sách các sự kiện, dùng cho việc đồng bộ dần dần.
+
+- Thao tác đọc (read/query): Khi bạn muốn xem sản phẩm và lượt đánh giá:
+
+  - Duyệt qua danh sách các sự kiện.
+  - Tính toán tổng và trung bình đánh giá dựa trên dữ liệu toàn bộ sự kiện.
+  - Kết quả cuối cùng: hiển thị sản phẩm cùng số lượt và trung bình đánh giá.
+
+Lưu ý: thông thường các hệ thống sử dụng CQRS có tải READ cao sẽ không thường dùng cách tính toán lại toàn bộ events từ WRITE. Thay vào đó, hệ thống sẽ sao lưu dưới dạng các snapshots được tính toán từ trước và tiến hành đồng bộ lại sau. Điều này giúp tăng tải rất đáng kể cho READ nhưng đánh đổi rằng hệ thống phải chấp nhận `Eventual Consistency` (sự nhất quán sau cùng).
+
+## 5. Kết luận
+
+CQRS chia nhỏ trách nhiệm, cho phép từng luồng hoạt động được thiết kế và tối ưu hóa riêng biệt. Nhờ cách tiếp cận này, các hệ thống quy mô lớn có thể vận hành mượt mà hơn, tránh được những giới hạn thường gặp ở các thiết kế truyền thống khi cả đọc và ghi đều diễn ra trên cùng một Database.

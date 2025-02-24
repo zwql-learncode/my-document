@@ -4,23 +4,13 @@ const sidebars: SidebarsConfig = {
   tutorialSidebar: [
     {
       type: "category",
-      label: "Design Pattern",
-      items: ["repository", "dependency-injection"],
-    },
-    {
-      type: "category",
       label: "Architecture Pattern",
       items: ["milan/vsa_milan"],
     },
     {
       type: "category",
-      label: "Mehmet Ozkaya Document",
-      items: [
-        "mehmet/microservices",
-        "mehmet/docker",
-        "mehmet/vsa",
-        "mehmet/cqrs",
-      ],
+      label: "Design Pattern",
+      items: ["repository", "dependency-injection"],
     },
     {
       type: "category",
@@ -33,9 +23,24 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
+          label: "Design Pattern",
+          items: ["200lab/cqrs_200lab"],
+        },
+        {
+          type: "category",
           label: "CI/CD",
           items: ["200lab/docker_200lab"],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Mehmet Ozkaya Document",
+      items: [
+        "mehmet/microservices",
+        "mehmet/docker",
+        "mehmet/vsa",
+        "mehmet/cqrs",
       ],
     },
   ],
