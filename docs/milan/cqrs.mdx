@@ -1,0 +1,72 @@
+---
+id: cqrs_milan
+title: CQRS
+---
+
+# CQRS Document
+
+Dịch từ bài viết [CQRS Pattern With MediatR](https://www.milanjovanovic.tech/blog/cqrs-pattern-with-mediatr) của Milan Jovanović
+
+## 1. CQRS là gì?
+
+CQRS (Command Query Responsibility Segregation) là một design pattern tách biệt các thao tác ghi (write) và đọc (read) trong ứng dụng.
+
+Sự tách biệt này có thể được triển khai logic (logical implementation) hoặc triển khai vật lý (physical implementation), mang lại nhiều lợi ích như:
+
+- Quản lý độ phức tạp: Giảm sự ràng buộc giữa các phần của hệ thống.
+- Cải thiện hiệu suất: Tối ưu hóa truy vấn dữ liệu và giảm tải cho hệ thống.
+- Khả năng mở rộng: Dễ dàng scale hệ thống theo nhu cầu thực tế.
+- Tính linh hoạt: Cho phép sử dụng các mô hình dữ liệu khác nhau cho đọc và ghi.
+- Bảo mật: Hạn chế quyền truy cập, chỉ cho phép các thao tác phù hợp với vai trò của người dùng.
+
+Cách tiếp cận truyền thống khi làm việc với cơ sở dữ liệu là sử dụng cùng một mô hình để truy vấn và cập nhật dữ liệu. Cách này đơn giản và hoạt động tốt cho hầu hết các thao tác CRUD. Tuy nhiên, khi các ứng dụng phức tạp hơn, nó trở nên khó bảo trì.
+
+- Về phía ghi dữ liệu, mô hình thường chứa logic nghiệp vụ phức tạp và validations.
+- Về phía đọc dữ liệu, hệ thống có thể cần thực hiện nhiều truy vấn khác nhau để lấy thông tin mong muốn.
+
+Ngoài ra, khi thiết kế mô hình dữ liệu, ta thường tuân theo các nguyên tắc chuẩn hóa SQL, giúp tối ưu hóa việc ghi dữ liệu. Tuy nhiên, điều này lại không phù hợp với các thao tác đọc.
+
+Việc tách biệt mô hình cho Command và Query cho phép mở rộng hệ thống một cách độc lập:
+
+- Có thể chỉ tách logic, nhưng vẫn dùng chung cơ sở dữ liệu. (logical implementation)
+- Có thể tách thành các dịch vụ riêng biệt cho việc xử lý Command và Query.
+- Hoặc thậm chí sử dụng nhiều cơ sở dữ liệu khác nhau, được tối ưu hóa riêng cho ghi và đọc dữ liệu. (physical implementation)
+
+## 2. Các cách tiếp cận với CQRS
+
+Dưới đây là cái nhìn tổng quan về một hệ thống CQRS sử dụng nhiều cơ sở dữ liệu. Các commands sẽ cập nhật write database. Sau đó, cần phải đồng bộ hóa những cập nhật này với read database. Điều này dẫn đến `eventual consistency` (tính nhất quán cuối cùng) trong hệ thống CQRS.
+
+Tuy nhiên, `eventual consistency` làm tăng đáng kể độ phức tạp của ứng dụng. Bạn cần xem xét điều gì sẽ xảy ra nếu quá trình đồng bộ bị lỗi và phải có `fault tolerance strategy` (chiến lược chịu lỗi) để đảm bảo hệ thống hoạt động ổn định.
+
+![Ảnh minh họa: CQRS Physical Implementation](/img/milan/cqrs.png)
+
+> _Ảnh minh họa: CQRS Với cách triển khai vật lý_
+
+Có nhiều cách tiếp cận trong triển khai CQRS:
+
+- Sử dụng SQL cho ghi và NoSQL cho đọc (ví dụ: RavenDB).
+- Dùng Event Sourcing cho ghi và NoSQL cho đọc, giúp lưu trữ toàn bộ lịch sử thay đổi trạng thái.
+- Sử dụng Redis hoặc một hệ thống cache phân tán để cải thiện hiệu suất truy vấn dữ liệu đọc.
+
+## 3. Triển khai CQRS
+
+Làm thế nào để triển khai CQRS với hệ thống của bạn? Với ASP.NET, một cách phổ biến là sử dụng thư viện `MediatR`.
+
+MediatR triển khai `mediator pattern`, giúp giải quyết một vấn đề đơn giản: tách biệt quá trình gửi message khỏi quá trì xử lý message. Bạn có thể mở rộng interface IRequest của MediatR với các abstraction tùy chỉnh như ICommand và IQuery. Điều này giúp bạn định nghĩa rõ ràng các commands (đọc) và queries (ghi) trong hệ thống.
+
+- Commands: Tôi thường sử dụng EF Core với một rich domain model để đóng gói business logic. Luồng command sử dụng EF để tải một entity vào memory → thực thi domain logic → lưu thay đổi vào database.
+
+- Queries: Tôi muốn càng ít gián tiếp càng tốt. Sử dụng Dapper với các truy vấn SQL thuần là một lựa chọn tuyệt vời.
+
+![Ảnh minh họa: CQRS Application](/img/milan/cqrs_application.png)
+
+> _Ảnh minh họa: Một ứng dụng triển khai EF core ở phía ghi và Dapper ở phía đọc_
+
+## 4. Tổng kết
+
+Việc tách biệt việc commands (ghi) và queries (đọc) trong hệ thống giúp cải thiện hiệu suất và khả năng mở rộng về lâu dài. Bạn có thể tối ưu hóa từng phần riêng biệt dựa trên yêu cầu cụ thể của ứng dụng.
+
+- Commands: Đóng gói logic nghiệp vụ phức tạp và kiểm tra tính hợp lệ của dữ liệu. Sử dụng EF Core kết hợp với mô hình miền giàu (rich domain model) là một giải pháp hiệu quả.
+- Queries: Tập trung vào hiệu suất, vì vậy cần chọn giải pháp nhanh nhất. Có thể sử dụng truy vấn SQL thuần với Dapper, chiếu dữ liệu (projections) trong EF Core hoặc Redis để tăng tốc truy vấn.
+
+Việc áp dụng CQRS giúp hệ thống linh hoạt hơn, dễ mở rộng và tối ưu hiệu suất một cách hiệu quả.
