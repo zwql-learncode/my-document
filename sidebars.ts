@@ -10,7 +10,12 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Design Pattern",
-      items: ["repository", "dependency-injection", "milan/cqrs_milan"],
+      items: [
+        "repository",
+        "dependency-injection",
+        "milan/cqrs_milan",
+        "guru/mediator-guru",
+      ],
     },
     {
       type: "category",

@@ -1,0 +1,128 @@
+---
+id: mediator-guru
+title: Mediator
+---
+
+# Mediator Pattern
+
+Còn được gọi là: Intermediary, Controller
+
+Dịch từ bài viết [Mediator](https://refactoring.guru/design-patterns/mediator) của Refactoring Guru
+
+Mediator hay `Người điều phối` là một `behavioral design pattern` giúp bạn giảm được sự phụ thuộc lộn xộn giữa các object. Mediator pattern sẽ hạn chế các object giao tiếp trực tiếp với nhau. Thay vào đó, chúng sẽ tương tác thông qua một đối tượng trung gian (Mediator).
+
+## 1. Vấn đề
+
+Giả sử bạn có một cái dialog để tạo và chỉnh sửa thông tin khách hàng. Nó gồm nhiều thành phần như text fields, checkboxes, buttons,… Một số thành phần trong dialog có thể tác động lẫn nhau:
+
+- Khi người dùng tích vào checkbox "Tôi có nuôi chó", một text field để điền tên chó sẽ xuất hiện.
+- Submit button phải validate tất cả các trường dữ liệu trước khi gửi đi.
+
+Nếu bạn đặt trực tiếp logic này vào từng thành phần giao diện. Mỗi thành phần sẽ phụ thuộc chặt chẽ vào thành phần khác, tức là `tight coupling`. Sự thay đổi của một thành phần có thể sẽ gây `side effect`(tác dụng phụ) lên các thành phần khác. Điều này khiến các thành phần khó tái sử dụng trong các biểu mẫu khác & gây khó khăn trong việc maintain.
+
+- Bạn không thể sử dụng lại checkbox "Tôi có nuôi chó" trong một biểu mẫu khác, vì nó phụ thuộc vào ô nhập liệu tên chó.
+- Nếu muốn thay đổi cách các thành phần tương tác, bạn phải sửa đổi từng thành phần riêng lẻ.
+
+## 2. Giải pháp
+
+Mediator Pattern gợi ý rằng bạn nên dừng tất cả giao tiếp trực tiếp giữa các thành phần. Thay vào đó, các thành phần này sẽ làm việc gián tiếp thông qua một đối tượng trung gian (Mediator), đối tượng này sẽ điều phối và chuyển tiếp các lời gọi đến các thành phần thích hợp.
+
+Mỗi thành phần lúc này sẽ chỉ phụ thuộc vào một lớp Mediator duy nhất thay vì phải khớp nối với nhiều thành phần khác. Nhờ đó, thay vì một thành phần bị phụ thuộc với nhiều thành phần khác, nó chỉ cần phụ thuộc vào một lớp Mediator duy nhất.
+
+Trong ví dụ trên, lớp Dialog có thể đóng vai trò làm Mediator. Thông thường, hộp thoại đã có thông tin về tất cả các thành phần con của nó, vì vậy bạn không cần phải thêm bất kỳ phụ thuộc mới nào vào lớp này.
+
+- Thay vì button submit phải tự kiểm tra tất cả các giá trị trong biểu mẫu. Nó chỉ cần gửi thông báo cho dialog. Dialog sẽ chịu trách nhiệm kiểm tra dữ liệu hoặc giao nhiệm vụ này cho từng thành phần phù hợp.
+- Chúng ta có thể làm cho hệ thống linh hoạt hơn bằng cách sử dụng 1 interface cho tất cả các dialog. Interface này sẽ khai báo một phương thức notify(), để mọi thành phần trong biểu mẫu có thể sử dụng để gửi thông báo khi có sự kiện xảy ra.
+
+![Giải pháp cho ví dụ về Mediator Pattern](/img/guru/mediator-example.png)
+
+> _Giải pháp cho ví dụ về Mediator Pattern_
+
+Nhờ đó, nút Submit giờ có thể hoạt động với bất kỳ hộp thoại nào triển khai interface này, không chỉ riêng hộp thoại chỉnh sửa thông tin khách hàng.
+
+## 3. Ví dụ thực tế
+
+![Ảnh minh họa: Mediator Pattern](/img/guru/mediator-live-example.png)
+
+> _Các phi công máy bay không giao tiếp trực tiếp với nhau khi quyết định ai sẽ hạ cánh máy bay tiếp theo. Mọi thông tin liên lạc đều thông qua mediator - ở đây là tháp điều khiển._
+
+Các phi công khi hạ cánh hoặc cất cánh tại sân bay không liên lạc trực tiếp với nhau. Thay vào đó, họ giao tiếp với kiểm soát viên không lưu (ATC - Air Traffic Controller), người ngồi trong một tòa tháp cao gần đường băng.
+
+Nếu không có kiểm soát viên không lưu, mỗi phi công sẽ phải tự theo dõi tất cả máy bay xung quanh, rồi tự thảo luận với hàng chục phi công khác về thứ tự hạ cánh. Điều này có thể tăng đáng kể nguy cơ va chạm máy bay.
+
+Tuy nhiên, tháp kiểm soát không điều khiển toàn bộ chuyến bay. Nó chỉ quản lý máy bay trong khu vực sân bay, nơi có nhiều máy bay cùng hoạt động, giúp phi công tập trung vào nhiệm vụ chính của họ.
+
+Tương tự với Mediator Pattern, thay vì các thành phần phần mềm giao tiếp trực tiếp với nhau (dẫn đến rối loạn và phức tạp), chúng chỉ cần tương tác với Mediator, giúp hệ thống dễ quản lý hơn.
+
+## 4. Cấu trúc của Mediator Pattern
+
+![Cấu trúc của Mediator Pattern](/img/guru/mediator-structure.png)
+
+### 4.1. Component
+
+- Là các class chứa logic nghiệp vụ.
+- Mỗi component có một tham chiếu đến mediator, nhưng chỉ thông qua interface của mediator.
+- Điều này giúp component có thể tái sử dụng trong các thành phần khác mà không cần quan tâm đến bên trong mediator có gì.
+
+### 4.2. Mediator Interface
+
+- Xác định các phương thức giao tiếp giữa các component.
+- Thường chỉ có một phương thức notification, nơi component có thể gửi thông báo về sự kiện xảy ra.
+- Component có thể gửi thông tin về chính nó, nhưng không được tạo liên kết chặt chẽ với các component khác.
+
+### 4.3. Concrete Mediator
+
+- Chứa và quản lý mối quan hệ giữa các component.
+- Có thể giữ tham chiếu đến tất cả component mà nó điều phối.
+- Đôi khi quản lý luôn vòng đời của các component.
+
+### 4.4. Nguyên tắc hoạt động
+
+- Các component không biết về sự tồn tại của nhau. Nếu có sự kiện xảy ra, component chỉ cần gửi thông báo đến mediator.
+- Mediator nhận thông báo, xác định sender, và quyết định hành động tiếp theo (có thể gọi một component khác phản hồi).
+
+- Từ góc nhìn của component, mediator giống như một "hộp đen".
+  - Component gửi yêu cầu không cần biết ai sẽ xử lý.
+  - Component nhận yêu cầu cũng không cần biết ai gửi.
+
+Điều này giúp hệ thống linh hoạt, dễ mở rộng và tránh sự phụ thuộc lẫn nhau giữa các thành phần.
+
+## 5. Khi nào nên sử dụng Mediator Pattern
+
+1. Khi các class quá phụ thuộc vào nhau, khiến việc thay đổi trở nên khó khăn:
+
+- Mediator giúp tách biệt mối quan hệ giữa các class, đưa tất cả sự phụ thuộc vào một lớp trung gian. Nhờ đó, khi thay đổi một thành phần, bạn không cần lo `side effect` đến các thành phần khác.
+
+2. Khi không thể tái sử dụng một thành phần vì nó phụ thuộc quá nhiều vào các thành phần khác.
+
+- Mediator giúp các thành phần giao tiếp gián tiếp với nhau. Thay vì bị phụ thuộc với nhiều thành phần khác, mỗi thành phần chỉ cần phụ thuộc vào một lớp Mediator duy nhất.
+
+3. Khi phải tạo quá nhiều subclass chỉ để tái sử dụng một số hành vi chung trong các ngữ cảnh khác nhau.
+
+- Vì mọi quan hệ giữa các component đều nằm trong Mediator, bạn có thể dễ dàng định nghĩa cách các component tương tác bằng cách tạo Mediator mới, thay vì sửa từng component.
+
+## 6. Ưu và nhược điểm
+
+### Ưu điểm
+
+1. Tuân theo nguyên tắc Single Responsibility Principle (SRP)
+
+- Giúp tách biệt logic giao tiếp giữa các component vào một nơi duy nhất (Mediator).
+- Dễ hiểu, dễ bảo trì hơn vì không cần xử lý quan hệ phức tạp giữa các component.
+
+2. Tuân theo nguyên tắc Open/Closed Principle (OCP)
+
+- Dễ dàng mở rộng bằng cách thêm Mediator mới mà không cần thay đổi các component hiện có.
+
+3. Giảm sự phụ thuộc (coupling) giữa các component
+
+- Component không cần biết trực tiếp về nhau, chỉ cần tương tác với Mediator.
+- Giúp hệ thống linh hoạt hơn, tránh lỗi khi thay đổi một phần trong hệ thống.
+
+4. Tăng khả năng tái sử dụng các component
+
+- Các component có thể hoạt động độc lập, dễ dàng tái sử dụng trong các bối cảnh khác nhau.
+
+### Nhược điểm
+
+- Mediator có thể trở thành God Object: Nếu không thiết kế cẩn thận, Mediator có thể trở thành một class quá lớn, chứa quá nhiều logic, gây khó khăn trong việc bảo trì.
