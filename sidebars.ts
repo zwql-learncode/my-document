@@ -46,6 +46,7 @@ const sidebars: SidebarsConfig = {
         "mehmet/docker",
         "mehmet/vsa",
         "mehmet/cqrs",
+        "mehmet/distributed-cache_mehmet",
       ],
     },
   ],
