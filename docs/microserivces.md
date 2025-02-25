@@ -86,11 +86,13 @@ Mô hình này cho phép tổ chức tạo ra các nhóm liên chức năng nh�
 
 ### Tăng khả năng chịu lỗi của hệ thống
 
-Nếu một service bị lỗi thì chỉ có service đó bị ảnh hưởng. Các services khác vẫn sẽ tiếp tục xử lý các request.
+Microservices giúp hệ thống chịu lỗi tốt hơn vì mỗi service hoạt động độc lập. Nếu một service gặp sự cố, chỉ service đó bị ảnh hưởng, còn các service khác vẫn tiếp tục xử lý request bình thường. Điều này giúp hạn chế ảnh hưởng lan rộng, đảm bảo hệ thống vẫn hoạt động ngay cả khi có lỗi xảy ra.
 
-### Dễ dàng thay đổi sử dụng các công nghệ mới
+### Dễ dàng thay đổi, sử dụng các công nghệ mới
 
-Mỗi team có thể lựa chọn được technical stack riêng sao cho tối ưu cho service cần phát triển.
+- Mỗi service hoạt động độc lập, develop team có thể cập nhật hoặc thay thế công nghệ của một service mà không ảnh hưởng đến toàn bộ hệ thống.
+
+- Mỗi team có thể lựa chọn được technical stack riêng sao cho tối ưu cho service cần phát triển.
 
 ## 5. Thách thức của Microservices
 
