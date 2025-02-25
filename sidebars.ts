@@ -5,7 +5,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Architecture Pattern",
-      items: ["milan/vsa_milan", "milan/cqrs_milan", "microservices_doc"],
+      items: ["microservices_doc", "milan/vsa_milan", "milan/cqrs_milan"],
     },
     {
       type: "category",
