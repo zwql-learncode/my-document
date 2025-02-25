@@ -5,6 +5,8 @@ title: 5.Distributed Caching
 
 # Triển khai Distributed Caching trong Microservices
 
+Nguồn: Khóa học [Udemy .NET 8 Microservices](https://www.udemy.com/course/microservices-architecture-and-implementation-on-dotnet) của tác giả [Mehmet Ozkaya](https://www.linkedin.com/in/mehmet-ozkaya/?originalSubdomain=tr)
+
 Trong bài viết này, chúng ta sẽ triển khai Distributed Caching bằng với Redis, sử dụng chiến lược caching `Cache-Aside`, hai design pattern là `Proxy Pattern`, `Decorator Pattern` và thư viện `Scrutor`.
 
 ## 1.Redis là gì?

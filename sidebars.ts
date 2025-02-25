@@ -5,17 +5,12 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Architecture Pattern",
-      items: ["milan/vsa_milan"],
+      items: ["milan/vsa_milan", "milan/cqrs_milan"],
     },
     {
       type: "category",
       label: "Design Pattern",
-      items: [
-        "repository",
-        "dependency-injection",
-        "milan/cqrs_milan",
-        "guru/mediator-guru",
-      ],
+      items: ["repository", "dependency-injection", "guru/mediator-guru"],
     },
     {
       type: "category",
@@ -24,17 +19,17 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           label: "Architecture Pattern",
-          items: ["200lab/microservices_200lab"],
-        },
-        {
-          type: "category",
-          label: "Design Pattern",
-          items: ["200lab/cqrs_200lab"],
+          items: ["200lab/microservices_200lab", "200lab/cqrs_200lab"],
         },
         {
           type: "category",
           label: "CI/CD",
           items: ["200lab/docker_200lab"],
+        },
+        {
+          type: "category",
+          label: "Optimization",
+          items: ["200lab/caching_200lab"],
         },
       ],
     },
@@ -42,11 +37,17 @@ const sidebars: SidebarsConfig = {
       type: "category",
       label: "Mehmet Ozkaya Document",
       items: [
-        "mehmet/microservices",
-        "mehmet/docker",
-        "mehmet/vsa",
-        "mehmet/cqrs",
-        "mehmet/distributed-cache_mehmet",
+        {
+          type: "category",
+          label: "Microservices Course Tutorial",
+          items: [
+            "mehmet/microservices",
+            "mehmet/docker",
+            "mehmet/vsa",
+            "mehmet/cqrs",
+            "mehmet/distributed-cache_mehmet",
+          ],
+        },
       ],
     },
   ],
