@@ -58,7 +58,7 @@ Ngoài ra, còn một số chiến lược caching nâng cao khác như:
 - Sử dụng các lớp decorator để bổ sung hành vi mới mà không sửa đổi code gốc.
 - Ứng dụng: Thêm tính năng cho đối tượng trong runtime, ví dụ như mở rộng một cửa sổ với thanh cuộn hoặc viền mà không thay đổi code gốc.
 
-### 3.3x` Scrutor
+### 3.3 Scrutor
 
 - Scrutor là một thư viện ASP.NET giúp triển khai các pattern như Decorator theo cách rõ ràng và đơn giản hóa quá trình register decorator trong IOC container.
 
