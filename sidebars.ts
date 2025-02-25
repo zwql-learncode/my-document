@@ -23,6 +23,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
+          label: "Database",
+          items: ["200lab/redis_200lab"],
+        },
+        {
+          type: "category",
           label: "CI/CD",
           items: ["200lab/docker_200lab"],
         },
