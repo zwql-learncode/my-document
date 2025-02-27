@@ -51,6 +51,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/vsa",
             "mehmet/cqrs",
             "mehmet/distributed-cache_mehmet",
+            "mehmet/grpc_mehmet",
           ],
         },
       ],
