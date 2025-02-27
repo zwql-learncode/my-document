@@ -5,7 +5,15 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Architecture Pattern",
-      items: ["microservices_doc", "milan/vsa_milan", "milan/cqrs_milan"],
+      items: [
+        {
+          type: "category",
+          label: "Microservices",
+          items: ["microservices_doc", "200lab/grpc_200lab"],
+        },
+        "milan/vsa_milan",
+        "milan/cqrs_milan",
+      ],
     },
     {
       type: "category",
@@ -28,7 +36,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
-          label: "CI/CD",
+          label: "DevOps",
           items: ["200lab/docker_200lab"],
         },
         {
