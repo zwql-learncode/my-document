@@ -60,6 +60,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/cqrs",
             "mehmet/distributed-cache_mehmet",
             "mehmet/grpc_mehmet",
+            "mehmet/clean-architecture_mehmet",
           ],
         },
       ],
