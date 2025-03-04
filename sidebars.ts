@@ -11,6 +11,11 @@ const sidebars: SidebarsConfig = {
           label: "Microservices",
           items: ["microservices_doc", "200lab/grpc_200lab"],
         },
+        {
+          type: "category",
+          label: "Clean Architecture",
+          items: ["ddd-doc"],
+        },
         "milan/vsa_milan",
         "milan/cqrs_milan",
       ],
