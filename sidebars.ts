@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
           label: "Optimization",
           items: ["200lab/caching_200lab"],
         },
+        "200lab/ddd-200lab",
       ],
     },
     {
