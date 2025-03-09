@@ -26,8 +26,13 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "category",
-          label: "Classical Design Pattern",
+          label: "23 Classical Design Pattern",
           items: [
+            {
+              type: "category",
+              label: "Structural Design Patterns",
+              items: ["guru/decorator-guru"],
+            },
             {
               type: "category",
               label: "Behavioral Design Patterns",
