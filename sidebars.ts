@@ -23,7 +23,24 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Design Pattern",
-      items: ["repository", "dependency-injection", "guru/mediator-guru"],
+      items: [
+        {
+          type: "category",
+          label: "Classical Design Pattern",
+          items: [
+            {
+              type: "category",
+              label: "Behavioral Design Patterns",
+              items: ["guru/mediator-guru"],
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Other",
+          items: ["repository", "dependency-injection"],
+        },
+      ],
     },
     {
       type: "category",
