@@ -26,7 +26,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "category",
-          label: "23 Classical Design Pattern",
+          label: "23 Classical Design Patterns - Guru Refactoring Document",
           items: [
             {
               type: "category",
@@ -54,7 +54,11 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           label: "Architecture Pattern",
-          items: ["200lab/microservices_200lab", "200lab/cqrs_200lab"],
+          items: [
+            "200lab/microservices_200lab",
+            "200lab/ca_200lab",
+            "200lab/cqrs_200lab",
+          ],
         },
         {
           type: "category",
