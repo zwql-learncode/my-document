@@ -31,7 +31,7 @@ const sidebars: SidebarsConfig = {
             {
               type: "category",
               label: "Structural Design Patterns",
-              items: ["guru/decorator-guru"],
+              items: ["guru/proxy-guru", "guru/decorator-guru"],
             },
             {
               type: "category",
