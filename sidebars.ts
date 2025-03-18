@@ -93,6 +93,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/distributed-cache_mehmet",
             "mehmet/grpc_mehmet",
             "mehmet/clean-architecture_mehmet",
+            "mehmet/event-sourcing_mehmet",
           ],
         },
       ],
