@@ -78,7 +78,12 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           label: "Communication",
-          items: ["200lab/rest-api_200lab", "200lab/grpc_200lab"],
+          items: [
+            "200lab/rest-api_200lab",
+            "200lab/grpc_200lab",
+            "200lab/message-broker_200lab",
+            "200lab/rabbitmq_200lab",
+          ],
         },
         "200lab/ddd-200lab",
       ],
