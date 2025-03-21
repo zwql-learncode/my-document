@@ -1,0 +1,247 @@
+---
+id: rabbitmq_mehmet
+title: 9. RabbitMQ
+---
+
+# RabbitMQ Document
+
+Nguồn: Khóa học [Udemy .NET 8 Microservices](https://www.udemy.com/course/microservices-architecture-and-implementation-on-dotnet) của tác giả [Mehmet Ozkaya](https://www.linkedin.com/in/mehmet-ozkaya/?originalSubdomain=tr)
+
+## 1. Asynchronous Communication(Giao tiếp bất đồng bộ) trong Microservices
+
+Trong kiến trúc Microservices, Asynchronous Communication (giao tiếp bất đồng bộ) là một cách giúp các service trao đổi dữ liệu mà không cần phải chờ response ngay lập tức, từ đó tăng hiệu suất và giảm sự phụ thuộc giữa các service.
+
+### 1.1. Vấn đề của Synchronous Communication (Giao tiếp đồng bộ)
+
+Trong giao tiếp đồng bộ, khi một service gọi một service khác, nó phải đợi response, tạo thành một request chain (chuỗi yêu cầu) dẫn. Điều này là hệ thống tight coupling (phụ thuộc chặt chẽ) giữa các microservices, khiến hệ thống khó mở rộng và dễ bị lỗi dây chuyền.
+
+Đây chính là một Anti-pattern trong kiến trúc microservices, và nếu không xử lý tốt, hệ thống có thể bị sập khi một service quan trọng gặp sự cố.
+
+### 1.2. Asynchronous Communication (Giao tiếp bất đồng bộ)
+
+Với giao tiếp bẩt đồng bộ, khi client gửi một request đến service, nó không cần phải chờ response mà tiếp tục thực thi công việc khác. Điều này giúp tránh blocking thread (chặn luồng xử lý), nghĩa là hệ thống vẫn có thể hoạt động bình thường mà không bị dừng lại chỉ để đợi phản hồi từ server.
+
+Nhờ đó, sử dụng Asynchronous Communication (Giao tiếp bất đồng bộ) giúp giải quyết vấn đề trên bằng cách cho phép các service giao tiếp gián tiếp thông qua AMQP và Message Broker, từ đó làm giảm độ phụ thuộc và tăng khả năng mở rộng của hệ thống.
+
+AMQP (Advanced Message Queuing Protocol) là giao thức giao tiếp bất đồng bộ phổ biến nhất. Khi sử dụng AMQP, client không giao tiếp trực tiếp với service mà sử dụng một Message Broker (hệ thống trung gian) như Kafka hoặc RabbitMQ để truyền tải message (thông điệp). Client chỉ cần gửi message và không cần quan tâm khi nào Server xử lý xong.
+
+### 1.3. Message Broker
+
+Cách thức hoạt động của hệ thống Message Broker:
+
+- Producer (Service gửi message): gửi message mà không cần chờ response.
+- Message Broker (Hệ thống trung gian): Nhận message và lưu trữ nó tạm thời hoặc vĩnh viễn tùy theo cấu hình.
+- Subscriber (Service nhận message): Sẽ consumer (tiêu thụ) message một cách bất đồng bộ, tức là xử lý khi có thời gian, không làm ảnh hưởng đến quá trình gửi của Producer.
+
+Nếu chỉ có một số ít interaction (tương tác) giữa microservices, có thể sử dụng HTTP REST API để trao đổi dữ liệu. Nhưng khi số lượng interaction (tương tác) tăng cao, việc sử dụng HTTP request đồng bộ sẽ gây nghẽn hệ thống và làm giảm hiệu suất. Khi đó, Message Broker trở thành giải pháp tối ưu, cho phép microservices giao tiếp linh hoạt, không bị phụ thuộc vào thời gian phản hồi của nhau.
+
+Cơ chế retry: Nếu Consumer Service (service tiêu thụ message) bị gián đoạn, Message Broker có thể tự động retry (gửi lại) tin nhắn cho đến khi thành công. Các tin nhắn có thể được lưu trữ vĩnh viễn trong database hoặc chỉ lưu tạm thời trong bộ nhớ. Nhờ Message Broker, các service không cần phải hoạt động đồng thời vẫn có thể giao tiếp được, giúp hệ thống mở rộng dễ dàng và giảm độ phụ thuộc giữa các service.
+
+## 2. Lợi ích của Asynchronous Communication(Giao tiếp bất đồng bộ)
+
+### Dễ dàng thêm/bớt Subscriber Services
+
+- Các service có thể đăng ký nhận thông báo từ các events (sự kiện) mà không ảnh hưởng đến Producer. Do đó thể thêm hoặc gỡ bỏ Subscriber bất cứ lúc nào, mà không cần chỉnh sửa Producer
+- Producer không cần biết Subscriber nào đang nhận message, vì vậy việc thêm hoặc xóa Subscriber sẽ không ảnh hưởng đến Producer.
+- Producer không cần biết có bao nhiêu Subscriber đang nhận message.
+
+Điều này giúp hệ thống mở rộng một cách linh hoạt mà không ảnh hưởng đến Service hiện có.
+
+### Scalability (Khả năng mở rộng)
+
+Với giao tiếp bất đồng bộ, ta có thể mở rộng từng thành phần một cách độc lập:
+
+- Producer có thể tăng số lượng instance để gửi nhiều tin nhắn hơn.
+- Subscriber có thể được mở rộng để xử lý tin nhắn nhanh hơn.
+- Message Broker có thể được phân tán để hỗ trợ nhiều subscriber hơn.
+- Nếu số lượng message tăng cao, Message Broker có thể phân phối chúng đến nhiều Consumer khác nhau, giúp tăng tốc độ xử lý.
+
+Trong môi trường microservices, Kubernetes hỗ trợ auto-scaler, cho phép tự động mở rộng số lượng pod dựa trên CPU và RAM sử dụng. Ngoài ra, ta có thể sử dụng KEDA (Kubernetes Event-Driven Autoscaler) để tự động scale services dựa trên lượng tải của message broker.
+
+- Ví dụ: Nếu Kafka có quá nhiều message so với dự kiến, KEDA có thể tự động mở rộng số lượng consumer để xử lý nhanh hơn.
+
+Nhờ vào đó, giao tiếp bất đồng bộ giúp hệ thống linh hoạt hơn trong việc mở rộng, giảm thiểu rủi ro quá tải ở các service quan trọng.
+
+### Hỗ trợ Event-Driven Microservices
+
+Event-Driven Architecture là cách tối ưu nhất để các microservices giao tiếp với nhau. Thay vì gửi yêu cầu trực tiếp đến nhau, các microservices có thể:
+
+- Tạo ra sự kiện (events) khi có thay đổi dữ liệu hoặc trạng thái.
+- Gửi sự kiện đến message broker hoặc event bus.
+- Các service khác đăng ký nhận sự kiện và xử lý nó khi cần thiết.
+
+Cách tiếp cận này giúp hệ thống linh hoạt, mở rộng dễ dàng và giảm sự phụ thuộc giữa các dịch vụ, từ đó nâng cao hiệu suất và độ tin cậy của hệ thống microservices.
+
+## 3. Thách thức của Asynchronous Communication(Giao tiếp bất đồng bộ)
+
+### Single Point of Failure (Điểm lỗi đơn)
+
+Nếu không được cấu hình đúng cách, Message Broker có thể trở thành một Single Point of Failure (điểm lỗi đơn) làm gián đoạn toàn bộ hệ thống.
+
+Không nên phụ thuộc vào một node duy nhất của Message Broker. Thay vào đó, ta nên scale hệ thống Message Broker và kết hợp giao tiếp đồng bộ và bất đồng bộ tùy vào từng trường hợp cụ thể.
+
+### Debugging
+
+Việc debug hệ thống bất đồng bộ rất phức tạp, vì không thể dễ dàng theo dõi luồng dữ liệu khi nó di chuyển qua nhiều service khác nhau. Tin nhắn được xử lý khi đến hệ thống tiêu thụ (consumer) thay vì theo luồng trực tiếp, nên khó xác định vấn đề xảy ra ở đâu và tại thời điểm nào.
+
+Cách giải quyết phổ biến là tạo một ID duy nhất cho mỗi tin nhắn khi nó được gửi đi, giúp theo dõi qua log dễ dàng hơn.
+
+### Cơ chế At-least-one deliver & Không đảm bảo thứ tự tin nhắn
+
+Hầu hết các message broker áp dụng cơ chế at-least-one delivery (ít nhất một lần gửi), nghĩa là một tin nhắn có thể bị gửi lại nhiều lần, gây ra các vấn đề về xử lý trùng lặp.
+
+Đồng thời, thứ tự tin nhắn không được đảm bảo. Nếu cần giữ thứ tự (FIFO - First In First Out), ta cần thiết kế consumer idempotent hoặc dùng các cơ chế đảm bảo FIFO riêng cho từng trường hợp cụ thể.
+
+## 4.Fan-Out Publish/Subscribe Messaging Pattern
+
+### Fan-Out
+
+Fan-out là một messaging pattern phân phối một tin nhắn đến nhiều đích (destination) cùng lúc, song song. Ý tưởng chính là các Subscribers (hệ thống nhận tin) có thể xử lý tin nhắn đồng thời, không phụ thuộc vào nhau.
+
+Một cách phổ biến để thực hiện Fan-Out là sử dụng mô hình Publish/Subscribe. Trong mô hình này, ta tạo một topic (điểm truy cập logic để giao tiếp tin nhắn bất đồng bộ). Publisher gửi tin nhắn đến topic, sau đó tin nhắn được tự động gửi đến tất cả Subscriber đăng ký vào topic đó.
+Quá trình này hoàn toàn không ràng buộc giữa Publisher và Subscriber, giúp giao tiếp bất đồng bộ và linh hoạt hơn.
+
+### Publish/Subscribe (Pub/Sub)
+
+Publish/Subscribe là một dạng giao tiếp bất đồng bộ giữa các service trong microservices. Bất kỳ tin nhắn nào được gửi đến topic sẽ ngay lập tức được tất cả subscriber nhận được. Mô hình Pub/Sub giúp xây dựng event-driven architecture (kiến trúc hướng sự kiện), giúp tách rời các ứng dụng để tăng hiệu suất, độ tin cậy và khả năng mở rộng.
+
+Trong các hệ thống cloud hiện đại, các ứng dụng được chia nhỏ thành các khối nhỏ, độc lập, giúp dễ dàng phát triển, triển khai và bảo trì. Pub/Sub hỗ trợ thông báo event (sự kiện) theo thời gian thực cho các ứng dụng phân tán. Message Topic cung cấp cơ chế truyền tin nhẹ để gửi thông báo sự kiện bất đồng bộ, cho phép các thành phần phần mềm kết nối để gửi và nhận message dễ dàng hơn.
+
+### Lợi ích của Fan-Out Publish/Subscribe
+
+- Mở rộng linh hoạt: Mỗi service có thể hoạt động và mở rộng độc lập, không phụ thuộc vào các service khác.
+- Tăng hiệu suất & khả năng chịu tải: Tin nhắn được phát sóng đồng thời đến nhiều hệ thống giúp giảm tải cho từng service riêng lẻ.
+- Loosely Coupled: Publisher không cần biết Subscriber nào đang nhận tin, và Subscriber cũng không cần quan tâm tin nhắn đến từ đâu.
+- Quản lý kiến trúc phức tạp dễ dàng hơn: Các thành phần microservices có thể liên kết chặt chẽ trong nội bộ nhưng vẫn giao tiếp linh hoạt với nhau.
+
+## 5. Event-Driven Microservices Architecture
+
+Trong kiến trúc microservices hướng sự kiện (Event-Driven Microservices Architecture), các service giao tiếp với nhau thông qua việc xuất bản (publish) và đăng ký (subscribe) sự kiện.
+Khi một service cần gửi message đến dịch vụ khác, nó xuất bản event (sự kiện) lên message broker hoặc event bus. Các service khác có thể đăng ký (subscribe) sự kiện này và thực hiện hành động phù hợp khi nhận được sự kiện.
+
+Lợi ích của kiến trúc Event-Driven Microservices:
+
+- Asynchronous Communication (Giao tiếp bất đồng bộ): Một đặc điểm quan trọng của kiến trúc này là cho phép các dịch vụ giao tiếp bất đồng bộ thay vì đồng bộ. Nghĩa là dịch vụ có thể gửi sự kiện và tiếp tục xử lý công việc khác mà không cần chờ phản hồi từ dịch vụ nhận.
+
+- Decoupled Communication (Giao tiếp tách rời): Publisher và Subscriber hoạt động độc lập, không phụ thuộc trực tiếp vào nhau. Giúp các dịch vụ có thể phát triển và thay đổi độc lập mà không ảnh hưởng đến toàn hệ thống.
+
+- Real-time Processing (Xử lý thời gian thực): Kiến trúc này hỗ trợ xử lý dữ liệu theo thời gian thực, khi sự kiện được tạo ra thì nó sẽ được tiêu thụ ngay lập tức.
+
+  - Ứng dụng: Các hệ thống theo dõi thay đổi dữ liệu (Change Data Capture - CDC), xử lý giao dịch tài chính theo thời gian thực, hệ thống phân tích dữ liệu tức thì.
+
+- High Volume Events Handling (Xử lý khối lượng lớn sự kiện): Event-driven architecture phù hợp với hệ thống có lưu lượng sự kiện lớn, vì nó có thể mở rộng theo chiều ngang (scale-out) bằng cách thêm nhiều consumer xử lý sự kiện. Trong các hệ thống microservices lớn , từng dịch vụ có thể tự mở rộng độc lập, giúp tối ưu hiệu suất khi lượng dữ liệu tăng đột biến.
+
+## 6. RabbitMQ
+
+RabbitMQ là một message broker triển khai giao thức AMQP (Advanced Messaging Queue Protocol). Cho phép các ứng dụng giao tiếp với nhau bằng cách gửi và nhận tin nhắn qua hàng đợi (queue).
+
+RabbitMQ hoạt động theo cơ chế queue: Tin nhắn được lưu trữ trong hàng đợi cho đến khi được xử lý theo đúng thứ tự. Hỗ trợ gửi và nhận tin nhắn bất đồng bộ (asynchronous messaging), tách biệt sender và receiver, giúp hệ thống hoạt động hiệu quả hơn và mở rộng dễ dàng.
+
+RabbitMQ hỗ trợ đa nền tảng và mã nguồn mở, cho nên rất phổ biến trong các hệ thống microservices.
+
+Các hệ thống tương tự có thể kể đến: Apache Kafka, MSMQ, Azure Service Bus, Kestrel, ActiveMQ, v.v.
+
+![RabbitMQ Architecture image](/img/mehmet/rabbitmq-architecture.png)
+
+> _RabbitMQ Architecture_
+
+Các thành phần chính:
+
+- `Producer`: Là nguồn gửi tin nhắn đến hệ thống. Ứng dụng có thể xuất bản tin nhắn vào hàng đợi (queue) thông qua exchange.
+
+- `Queue`: Là nơi lưu trữ tin nhắn trước khi được tiêu thụ. Tất cả tin nhắn gửi đến hệ thống được đặt vào hàng đợi và chờ xử lý.
+
+- `Consumer`: Là ứng dụng nhận và xử lý tin nhắn từ queue. Consumer có thể nhận tin nhắn theo chế độ pull hoặc push.
+
+- `Message`: Dữ liệu được gửi giữa Producer và Consumer thông qua queue. Có thể là JSON, XML, text, binary, v.v.
+
+- `Exchange`: Là thành phần định tuyến tin nhắn, quyết định gửi tin nhắn đến queue nào. Các loại exchange phổ biến( Direct, Fanout, Topic, Header).
+
+- `Bindings`: Là liên kết giữa Exchange và Queue. Định nghĩa cách tin nhắn từ Exchange được chuyển đến Queue dựa trên routing key.
+
+## 7. Các loại Exchange trong RabbitMQ
+
+Exchange là thành phần định tuyến tin nhắn đến các hàng đợi (queue) trong RabbitMQ. Mỗi loại exchange có thuật toán định tuyến khác nhau, quyết định tin nhắn sẽ được gửi đến queue nào.
+
+### 7.1. Direct Exchange
+
+Định tuyến tin nhắn dựa trên routing key. Cách hoạt động:
+
+- Producer gửi tin nhắn đến exchange kèm theo routing key.
+- Exchange chỉ gửi tin nhắn đến những queue có routing key khớp chính xác với tin nhắn.
+
+Ứng dụng: Xử lý công việc theo nhóm (Work Queue Processing).
+
+Ví dụ: Gửi tin nhắn có routing_key = "email_queue", chỉ queue email_queue nhận tin.
+
+```
+Exchange (direct) → Queue A (email) (✔ Khớp routing key)
+                  → Queue B (sms) (❌ Không khớp, bỏ qua)
+```
+
+### 7.2. Topic Exchange
+
+Định tuyến tin nhắn dựa trên pattern (ký tự đại diện trong routing key). Sử dụng ký tự \* và # để khớp với nhiều routing key.
+
+```
+- : thay thế cho một từ.
+# : thay thế cho nhiều từ.
+```
+
+Ứng dụng: Hệ thống logging, phân loại sự kiện theo mức độ (info, warning, error).
+
+Ví dụ:
+
+- logs.info → Gửi đến queue info_logs.
+- logs.# → Nhận tất cả các log (logs.info, logs.error, logs.warning).
+
+```
+Exchange (topic) → Queue A (logs.*) (Nhận logs.info, logs.warning)
+                  → Queue B (logs.#) (Nhận tất cả logs)
+```
+
+### 7.3. Fanout Exchange
+
+Gửi tin nhắn đến tất cả queue mà không cần routing key. Cách hoạt động:
+
+- Bất kỳ tin nhắn nào nhận được từ producer đều được gửi đến tất cả queue đã đăng ký.
+- Không quan tâm đến nội dung tin nhắn hay routing key.
+
+Ứng dụng:
+
+- Broadcast message (gửi thông báo chung, thông tin cập nhật cho nhiều dịch vụ).
+- Ứng dụng chat, thông báo sự kiện trong game.
+
+Ví dụ: Thông báo người dùng online trong game đến tất cả server.
+
+```
+Exchange (fanout) → Queue A (Nhận tin nhắn)
+                   → Queue B (Nhận tin nhắn)
+                   → Queue C (Nhận tin nhắn)
+```
+
+### 7.4. Headers Exchange
+
+Định tuyến tin nhắn dựa trên thuộc tính trong header của tin nhắn (không dùng routing key). Cách hoạt động:
+
+- Consumer đăng ký nhận tin nhắn dựa trên thuộc tính trong header.
+- Exchange so khớp header trong tin nhắn với queue phù hợp.
+
+Ứng dụng:
+Xử lý tin nhắn theo metadata, bảo mật, phân loại nâng cao.
+
+Ví dụ: Header `{type: "premium", region: "US"}` → Chỉ queue dành cho khách hàng premium tại Mỹ nhận tin nhắn.
+
+```
+Exchange (headers) → Queue A (type = premium) (✔ Nhận tin nhắn)
+                    → Queue B (type = standard) (❌ Bỏ qua)
+```
+
+### Tổng kết
+
+Khi nào nên chọn loại Exchange nào?
+
+- Direct Exchange: Khi cần gửi tin đến queue cụ thể.
+- Topic Exchange: Khi cần nhóm tin nhắn theo chủ đề.
+- Fanout Exchange: Khi cần broadcast tin nhắn đến tất cả queue.
+- Headers Exchange: Khi cần lọc tin nhắn theo thông tin chi tiết trong header.

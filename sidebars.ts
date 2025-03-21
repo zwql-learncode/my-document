@@ -94,6 +94,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/grpc_mehmet",
             "mehmet/clean-architecture_mehmet",
             "mehmet/event-sourcing_mehmet",
+            "mehmet/rabbitmq_mehmet",
           ],
         },
       ],
