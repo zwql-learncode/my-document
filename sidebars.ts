@@ -9,7 +9,7 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           label: "Microservices",
-          items: ["microservices_doc", "200lab/grpc_200lab"],
+          items: ["microservices_doc"],
         },
         {
           type: "category",
@@ -74,6 +74,11 @@ const sidebars: SidebarsConfig = {
           type: "category",
           label: "Optimization",
           items: ["200lab/caching_200lab"],
+        },
+        {
+          type: "category",
+          label: "Communication",
+          items: ["200lab/rest-api_200lab", "200lab/grpc_200lab"],
         },
         "200lab/ddd-200lab",
       ],
