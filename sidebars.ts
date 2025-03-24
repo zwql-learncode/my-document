@@ -11,13 +11,9 @@ const sidebars: SidebarsConfig = {
           label: "Microservices",
           items: ["microservices_doc"],
         },
-        {
-          type: "category",
-          label: "Clean Architecture",
-          items: ["ddd-doc"],
-        },
         "milan/vsa_milan",
         "milan/cqrs_milan",
+        "ddd-doc",
       ],
     },
     {
@@ -105,6 +101,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/clean-architecture_mehmet",
             "mehmet/event-sourcing_mehmet",
             "mehmet/rabbitmq_mehmet",
+            "mehmet/domain-event-integration-event_mehmet",
           ],
         },
       ],
