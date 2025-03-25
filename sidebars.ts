@@ -102,6 +102,7 @@ const sidebars: SidebarsConfig = {
             "mehmet/event-sourcing_mehmet",
             "mehmet/rabbitmq_mehmet",
             "mehmet/domain-event-integration-event_mehmet",
+            "mehmet/api-gateways_mehmet",
           ],
         },
       ],
