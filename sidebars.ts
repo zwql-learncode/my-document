@@ -64,7 +64,7 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           label: "DevOps",
-          items: ["200lab/docker_200lab"],
+          items: ["200lab/docker_200lab", "200lab/reverse-proxy_200lab"],
         },
         {
           type: "category",
