@@ -11,9 +11,11 @@ Tổng hợp từ Mehmet Ozkaya
 
 Monolithic Architecture ám chỉ một kiến trúc hệ thống mà tất cả các thành phần của ứng dụng đều nằm trong một source code duy nhất. Chính vì tất cả là một khối nên nó có một số đặc điểm chung đó là:
 
-- Kiến trúc đơn giản, dễ triển khai lên production
-- Mọi thứ được phát triển, deploy và scale trên 1 code base duy nhất
-- Ứng dụng được viết với 1 technical stack duy nhất
+- Kiến trúc đơn giản, dễ triển khai lên production.
+- Tất cả các tính năng của ứng dụng được phát triển, triển khai và mở rộng trong một codebase duy nhất.
+- Ứng dụng thường bị giới hạn trong một technical stack duy nhất.
+- Hiệu suất tốt trong hệ thống nhỏ.
+- Quản lý dễ dàng trong giai đoạn đầu.
 
 ### Vấn đề của Monolithic
 
@@ -24,7 +26,7 @@ Monolithic Architecture ám chỉ một kiến trúc hệ thống mà tất cả
   - Các thành phần trong ứng dụng phụ thuộc lộn xộn với nhau. Thay đổi một thành phần có thể gây tác dụng phụ (side effect) lên thành phần khác. Dẫn đến việc ảnh hưởng việc phát triển giữa các develop team. Mỗi develop team sẽ phải cẩn thận để không làm ảnh hưởng tới develop team khác.
   - Về lâu dài, số lượng code càng phình to, ứng dụng càng khó bảo trì & mở rộng.
 
-- Khả năng chịu lỗi kém: Một service không ổn định có thể làm sập cả hệ thống.
+- Khả năng chịu lỗi kém: Một service không ổn định có thể làm sập cả hệ thống. Do tất cả các module được gói trong một ứng dụng duy nhất, nếu một module gặp sự cố có thể làm gián đoạn toàn bộ ứng dụng.
 
 - Khó đổi mới: Ứng dụng Monolithic bị bó buộc trong một technical stack duy nhất. Dẫn đến khó thay đổi hay áp dụng công nghệ mới.
 
@@ -32,7 +34,7 @@ Những hạn chế của Monolithic dẫn tới sự ra đời của kiến tr�
 
 ## 2. Microservices Architecture
 
-Về cơ bản, Microservices Architecture là kiểu kiến trúc mà ứng dụng sẽ được phân tách thành các dịch vụ nhỏ và độc lập gọi là service. Mỗi service có thể được phát triển và bảo trì bởi một develop team tự quản, đây là phương pháp phát triển phần mềm có khả năng mở rộng cao nhất.
+Về cơ bản, Microservices Architecture là kiểu kiến trúc mà ứng dụng sẽ được phân tách thành các dịch vụ nhỏ và độc lập gọi là service. Mỗi service có thể được phát triển và bảo trì bởi một develop team tự quản giúp ứng dụng dễ mở rộng hơn theo chiều ngang (scale-out) nhờ khả năng triển khai từng dịch vụ độc lập.
 
 Microservices được xây dựng xoay quanh các `business capabilities` (năng lực nghiệp vụ). Mỗi service thực hiện một tập các chức năng chuyên biệt. Mỗi vùng chức năng giờ được thực thi bởi một service. Ứng dụng có thể chuyên biệt hơn cho từng usecase. Mỗi service có thể sử dụng nhiều technical stack khác nhau (Polyglot Microservices) để phục vụ cho từng mục đích cụ thể.
 
