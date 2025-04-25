@@ -118,6 +118,11 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Random",
+      items: ["random/batching-performance"],
+    },
   ],
 };
 
