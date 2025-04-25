@@ -86,6 +86,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "ASP.NET",
+      items: [
+        {
+          type: "category",
+          label: "EF Core",
+          items: ["asp-net/dapper/fast-bulk-inserts"],
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Mehmet Ozkaya Document",
       items: [
         {
