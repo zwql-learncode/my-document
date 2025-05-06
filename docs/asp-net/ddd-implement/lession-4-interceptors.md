@@ -1,21 +1,21 @@
 ---
-id: ef-core-interceptors
-title: EF Core Interceptors
+id: interceptors
+title: Interceptors
 ---
 
-# Hướng dẫn sử dụng EF Core Interceptors
+# Interceptors - EF Core
 
 Nguồn: Bài viết "How To Use EF Core Interceptors" của tác giả [Milan Jovanović](https://www.milanjovanovic.tech/blog/how-to-use-ef-core-interceptors)
 
-EF Core là ORM (Object-Relational Mapper) yêu thích của tôi dành cho các ứng dụng .NET. Nó có rất nhiều tính năng tuyệt vời nhưng đôi khi lại bị bỏ qua. Ví dụ như query splitting, query filters, và đặc biệt là interceptors.
+EF Core là ORM (Object-Relational Mapper) yêu thích của tôi dành cho các ứng dụng .NET. Tuy nhiên, nhiều tính năng tuyệt vời của nó đôi khi lại bị bỏ qua. Ví dụ như query splitting, query filters, và đặc biệt là interceptors.
 
 EF Interceptors rất thú vị vì bạn có thể làm nhiều điều mạnh mẽ với chúng, như:
 
-- Can thiệp vào quá trình ánh xạ dữ liệu (hook into materialization)
-- Xử lý lỗi xung đột lạc quan (handle optimistic concurrency errors)
+- Hook into materialization - Can thiệp vào quá trình ánh xạ dữ liệu
+- handle optimistic concurrency errors - Xử lý lỗi xung đột lạc quan
 - Thêm `query hints` (Gợi ý truy vấn)
 
-Một trong những trường hợp thực tế phổ biến nhất là thêm `behavior` (hành vi) khi lưu thay đổi vào cơ sở dữ liệu.
+Trường hợp sử dụng thực tế nhất là thêm hành vi khi lưu các thay đổi vào cơ sở dữ liệu.
 
 Hôm nay tôi sẽ giới thiệu 3 trường hợp sử dụng interceptors trong EF Core:
 
@@ -25,23 +25,31 @@ Hôm nay tôi sẽ giới thiệu 3 trường hợp sử dụng interceptors tro
 
 ## EF Interceptors là gì?
 
-Interceptors trong EF Core cho phép bạn can thiệp, thay đổi hoặc chặn các hoạt động của EF Core.Tất cả interceptor đều triển khai từ interface `IInterceptor`. Một số interface thường dùng: `IDbCommandInterceptor`, `IDbConnectionInterceptor`, `IDbTransactionInterceptor`.
+EF Core Interceptors cho phép bạn can thiệp (intercept), thay đổi (change), hoặc ngăn chặn (suppress) các hoạt động của EF Core.Tất cả interceptor đều triển khai từ interface `IInterceptor`. Một số interface thường dùng: `IDbCommandInterceptor`, `IDbConnectionInterceptor`, `IDbTransactionInterceptor`.
 
-Loại phổ biến nhất là `ISaveChangesInterceptor`, cho phép bạn can thiệp trước hoặc sau khi gọi `SaveChanges`.
+Loại phổ biến nhất là `ISaveChangesInterceptor`, cho phép bạn thêm hành vi trước hoặc sau khi save changes.
 
-Bạn không cần phải implement trực tiếp các interface này. Tốt hơn là sử dụng các `concrete implementations` (triển khai cụ thể) và override các phương thức cần thiết.
+Interceptor được đăng ký tại mỗi DbContext instance khi cấu hình context.
+
+```c#
+public interface IInterceptor
+{
+}
+```
+
+Bạn không cần phải triển khai trực tiếp các interface này. Tốt hơn là sử dụng các `concrete implementations` (triển khai cụ thể) và override các phương thức cần thiết.
 
 Ví dụ, tôi sẽ cho bạn thấy cách sử dụng `SaveChangesInterceptor`.
 
 ## Audit Logging
 
-Audit logging tức là lưu lại thông tin mỗi lần một thực thể được tạo hoặc sửa.
+Audit logging (nhật ký kiểm tra) tức là lưu lại thông tin mỗi lần một thực thể được tạo hoặc sửa.
 
 Một audit logging các thay đổi của entity là một tính năng rất giá trị trong một số ứng dụng. Bạn sẽ ghi thêm thông tin audit mỗi khi một entity được tạo mới hoặc chỉnh sửa. Nhật ký này cũng có thể chứa đầy đủ giá trị trước và sau thay đổi, tùy theo yêu cầu của bạn.
 
 Tuy nhiên, để dễ hiểu hơn, chúng ta sẽ bắt đầu với một ví dụ đơn giản.
 
-Tôi có một interface IAuditable với hai thuộc tính đại diện cho thời điểm entity được tạo hoặc chỉnh sửa:
+Tôi có một interface `IAuditable` với hai thuộc tính đại diện cho thời điểm entity được tạo hoặc chỉnh sửa:
 
 ```c#
 public interface IAuditable
@@ -106,9 +114,9 @@ internal sealed class UpdateAuditableInterceptor : SaveChangesInterceptor
 
 ## Publish Domain Events
 
-Một `use case` (trường hợp sử dụng) khác của EF Interceptors là publish domain events. Domain events là một DDD tactical pattern để tạo ra các hệ thống loosely coupled.
+Một trường hợp sử dụng khác của EF Interceptors là publish domain events. Domain events là một DDD tactical pattern để tạo ra các hệ thống `loosely coupled`.
 
-Domain events cho phép bạn diễn tả rõ ràng các `side effects` (tác dụng phụ) và giúp `separation of concerns` (phân tách mối quan tâm) tốt hơn trong domain.
+Domain events cho phép bạn thể hiện rõ ràng các `side effects` (tác dụng phụ) và giúp `separation of concerns` (phân tách mối quan tâm) tốt hơn trong domain.
 
 Bạn có thể tạo một interface `IDomainEvent`, kế thừa từ `MediatR.INotification`. Điều này cho phép bạn sử dụng `IPublisher` để publish domain events và xử lý chúng một cách bất đồng bộ.
 
@@ -122,13 +130,13 @@ public interface IDomainEvent : INotification
 
 Sau đó, tôi sẽ tạo một interceptor tên là `PublishDomainEventsInterceptor`, cũng kế thừa từ `SaveChangesInterceptor`. Tuy nhiên, lần này, chúng ta sẽ override phương thức `SavedChangesAsync` để publish các domain events sau khi thay đổi đã được lưu vào database.
 
-Điều này dẫn đến hai điểm quan trọng:
+Điều này có 2 ý nghĩa quan trọng:
 
-- Luồng công việc giờ đây là `eventually consistent`. Các handler của domain event sẽ thực hiện lưu dữ liệu vào database sau giao dịch ban đầu(original transaction).
+- Luồng công việc giờ đây là `eventually consistent`(sự nhất quán cuối cùng). Các handler của domain event sẽ thực hiện lưu dữ liệu vào database sau transaction ban đầu.
 
-- Nếu bất kỳ domain event handler nào bị lỗi, chúng ta có nguy cơ thất bại toàn bộ request, mặc dù giao dịch ban đầu đã hoàn tất thành công.
+- Nếu bất kỳ domain event handlers nào bị lỗi, ta có nguy cơ khiến request không thành công ngay cả khi transaction ban đầu đã hoàn tất thành công.
 
-Bạn có thể làm cho quy trình này đáng tin cậy hơn bằng cách sử dụng `Outbox Pattern`.
+Bạn có thể làm cho tiến trình này đáng tin cậy hơn bằng cách sử dụng `Outbox Pattern`.
 
 ```c#
 internal sealed class PublishDomainEventsInterceptor : SaveChangesInterceptor
@@ -177,22 +185,19 @@ internal sealed class PublishDomainEventsInterceptor : SaveChangesInterceptor
 }
 ```
 
-## Lưu trữ Outbox Messages
+## Lưu trữ Outbox Messages - EF Core
 
-Thay vì publish các domain events như một phần của giao dịch (transaction) trong Entity Framework, bạn có thể chuyển đổi chúng thành các Outbox message.
+Thay vì publish các domain events như một phần của EF transaction, bạn có thể chuyển đổi chúng thành các Outbox message.
 
 Dưới đây là một `InsertOutboxMessagesInterceptor` thực hiện chính xác điều đó.
 
-Interceptor này override (ghi đè) phương thức `SavingChangesAsync`, có nghĩa là nó sẽ chạy bên trong EF transaction hiện tại trước khi lưu thay đổi.
+Interceptor này ghi đè phương thức `SavingChangesAsync`. Điều đó có nghĩa là nó sẽ chạy bên trong EF transaction hiện tại trước khi lưu thay đổi.
 
-`InsertOutboxMessagesInterceptor` chuyển đổi bất kỳ domain event nào thành một `OutboxMessage ` và thêm nó vào `DbSet<OutboxMessage>` tương ứng.
+`InsertOutboxMessagesInterceptor` chuyển đổi bất kỳ domain event nào thành một `OutboxMessage ` và thêm nó vào `DbSet<OutboxMessage>` tương ứng. Điều này có nghĩa là chúng sẽ được lưu vào cơ sở dữ liệu với bất kỳ thay đổi hiện có nào bên trong cùng một giao dịch.
 
-Điều này có nghĩa là các Outbox message cũng sẽ được lưu vào cơ sở dữ liệu cùng với các thay đổi hiện có trong cùng một giao dịch.
+Đây là một hoạt động đồng thời.
 
-Đây là một `atomic operation` (hoạt động nguyên tử):
-
-- Hoặc mọi thứ thành công.
-- Hoặc mọi thứ thất bại.
+Hoặc mọi thứ thành công hoặc mọi thứ thất bại.
 
 Không có trạng thái trung gian như khi sử dụng `PublishDomainEventsInterceptor`.
 
@@ -253,15 +258,12 @@ public sealed class InsertOutboxMessagesInterceptor : SaveChangesInterceptor
 
 ## Cấu hình EF Interceptors
 
-Các EF Interceptors nên được thiết kế nhẹ (lightweight) và không trạng thái (stateless).
-
-Bạn có thể thêm chúng vào `DbContext` bằng cách gọi `AddInterceptors` và truyền vào các instance interceptor.
+Các EF Interceptors phải nhẹ (lightweight) và không trạng thái (stateless). Bạn có thể thêm chúng vào `DbContext` bằng cách gọi `AddInterceptors` và truyền vào các instance interceptor.
 
 Tôi thích cấu hình các interceptor thông qua Dependency Injection (DI) vì hai lý do:
 
-Nó cho phép tôi cũng sử dụng DI bên trong các interceptor (hãy lưu ý rằng các interceptor sẽ được đăng ký dạng singleton).
-
-Nó giản lược việc thêm interceptor vào `DbContext` khi dùng `AddDbContext`.
+- Nó cũng cho phép tôi sử dụng DI bên trong các interceptor (hãy lưu ý rằng các interceptor sẽ được đăng ký dạng singleton).
+- Nó giản lược việc thêm interceptor vào `DbContext` khi dùng `AddDbContext`.
 
 Dưới đây là cách bạn có thể cấu hình `UpdateAuditableInterceptor` và `InsertOutboxMessagesInterceptor` với `ApplicationDbContext`:
 
@@ -280,6 +282,6 @@ services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(
 ## Lời kết
 
 Interceptors cho phép bạn thực hiện gần như bất kỳ điều gì với các thao tác trong EF Core.
-Nhưng đi kèm với sức mạnh lớn là trách nhiệm lớn: bạn cần lưu ý rằng interceptors có thể ảnh hưởng đến hiệu suất. Các thao tác như gọi dịch vụ bên ngoài hoặc xử lý sự kiện sẽ làm chậm quá trình thực thi.
+Nhưng đi kèm với sức mạnh lớn là trách nhiệm lớn: bạn cần lưu ý rằng interceptors có thể ảnh hưởng đến hiệu suất. Các thao tác như gọi external services hoặc handling events sẽ làm chậm quá trình thực thi.
 
-Hãy nhớ rằng, bạn không nhất thiết phải dùng EF interceptors. Bạn hoàn toàn có thể đạt được hành vi tương tự bằng cách override (ghi đè) phương thức `SaveChangesAsync` trên `DbContext` và thêm logic tùy chỉnh của mình vào đó.
+Hãy nhớ rằng, bạn không nhất thiết phải dùng EF interceptors. Bạn hoàn toàn có thể đạt được hành vi tương tự bằng cách ghi đè phương thức `SaveChangesAsync` trên `DbContext` và thêm logic tùy chỉnh của mình vào đó.
