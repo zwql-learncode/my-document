@@ -1,6 +1,6 @@
 ---
 id: cursor-pagination
-title: Tìm hiểu về Cursor Pagination
+title: Cursor Pagination
 ---
 
 # Tìm hiểu về Cursor Pagination và Vì sao nó nhanh (Phân tích chuyên sâu)

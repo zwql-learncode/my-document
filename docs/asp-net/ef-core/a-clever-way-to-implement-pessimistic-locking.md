@@ -1,6 +1,6 @@
 ---
 id: a-clever-way-to-implement-pessimistic-locking
-title: Một Cách Thông Minh Để Triển Khai Pessimistic Locking trong EF Core
+title: Pessimistic Locking
 ---
 
 # Một Cách Thông Minh Để Triển Khai Pessimistic Locking trong EF Core
