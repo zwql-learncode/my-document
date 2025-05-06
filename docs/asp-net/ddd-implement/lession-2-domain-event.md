@@ -3,7 +3,7 @@ id: lession-2-domain-event
 title: Domain Events
 ---
 
-# Value Objects
+# Domain Events
 
 Nguồn: Bài viết "How To Use Domain Events To Build Loosely Coupled Systems" của tác giả [Milan Jovanović](https://www.milanjovanovic.tech/blog/how-to-use-domain-events-to-build-loosely-coupled-systems)
 
